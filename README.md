@@ -6,4 +6,4 @@ For the NLP part of the implementation we have used the set of essays made avail
 
 For the image processing part of the implementation we have used the set of 31 essays made available by students with the pictures of the esssays and their trascriptions, all in [pdf format](https://vestibular.brasilescola.uol.com.br/enem/enem-2018-estudantes-criam-apostila-com-31-redacoes-nota-1000/345098.html)
 
-The literature where we based our work can be found in the literature folder. 
+The literature where we based our work can be found in the [literature folder](https://github.com/ufrpe-mineracao-textos/projeto-de-mineracao-20192-automatic-essay-evaluation/tree/master/literature). 
