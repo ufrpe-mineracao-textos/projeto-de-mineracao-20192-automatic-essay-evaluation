@@ -5,13 +5,13 @@
 \date{}
 
 \begin{document}
-\begin{titlepage}
-\begin{center}
+
 \maketitle
+\begin{center}
 \textbf{Alunos}: Lucas Francisco Correia, Wilson Neto,  Ismael Cesar \\
 \textbf{Disciplina}: Processamento de imagens
 \end{center}
-\end{titlepage}
+
 
 \section{Introdução}
 \label{sec:introdcao}
@@ -25,11 +25,18 @@
 
 \section{Medotologia}
 \label{sec:metodologia}
+	A principal biblioteca utilizada na metodologia, pricipalmente na etapa de preprocessamento da imagem foi a bilioteca \textit{OpenCv}\cite{opencv_library} para linguagem de programação \textit{python}.
 	A primeira etapa para extração de texto trata-se do préprocessamento. 
 	Como as imagens de redação já vem em um formato padronizado fora utilizada somente a técnica de limiarização adaptativa gaussiana. 
 	Onde o tipo de binarização escolhida foi a binarização invertida. 
-	O tamanho do bloco utilizado foi $21$.
+	O tamanho do bloco utilizado foi $5$.
 	E valor da constante utilizada no método de limiarização gaussiana foi $15$.
-
+	Para detecção das linhas da folha de redação pretende-se utilizar transformada de Hough. 
+	Onde para remoção das linhas serão feitas considerando a presença ou não de caracteres escritos.
+	Para detecção e extração de textos, métodos utilizados ainda sendo investigados a partir de uma revisão de literatura.
+		
+	
+	
+\bibliographystyle{abbrv}
 \bibliography{bibliografia}
 \end{document}

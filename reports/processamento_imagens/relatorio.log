@@ -1,7 +1,7 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7050) (preloaded format=pdflatex 2019.4.16)  21 OCT 2019 10:18
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7050) (preloaded format=pdflatex 2019.4.16)  21 OCT 2019 10:28
 entering extended mode
-**./relatorio_primeira_entrega.tex
-(relatorio_primeira_entrega.tex
+**./relatorio.tex
+(relatorio.tex
 LaTeX2e <2018-04-01> patch level 5
 (/home/ismael/.miktex/texmfs/install/tex/latex/base/article.cls
 Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
@@ -24,8 +24,8 @@ File: size12.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
 LaTeX Warning: Unused global option(s):
     [a4].
 
-(relatorio_primeira_entrega.aux)
-\openout1 = `relatorio_primeira_entrega.aux'.
+(relatorio.aux)
+\openout1 = `relatorio.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 7.
 LaTeX Font Info:    ... okay on input line 7.
@@ -54,42 +54,35 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 23.
 
-LaTeX Warning: Citation `opencv_library' on page 1 undefined on input line 28.
-
-
-Overfull \hbox (23.72626pt too wide) in paragraph at lines 28--34
+Overfull \hbox (23.72626pt too wide) in paragraph at lines 28--37
 \OT1/cmr/m/n/12 padronizado fora utilizada somente a tecnica de limiarizac~ao
  adaptativa gaussiana.
  []
 
 
-Overfull \hbox (14.18155pt too wide) in paragraph at lines 28--34
+Overfull \hbox (14.18155pt too wide) in paragraph at lines 28--37
 \OT1/cmr/m/n/12 do bloco utilizado foi $5$. E valor da constante utilizada no m
 etodo de limiarizac~ao
  []
 
 [1
 
-{/home/ismael/.miktex/texmfs/data/pdftex/config/pdftex.map}]
-(relatorio_primeira_entrega.bbl) [2] (relatorio_primeira_entrega.aux)
-
-LaTeX Warning: There were undefined references.
-
- ) 
+{/home/ismael/.miktex/texmfs/data/pdftex/config/pdftex.map}] (relatorio.bbl)
+[2] (relatorio.aux) ) 
 Here is how much of TeX's memory you used:
- 249 strings out of 494887
- 3439 string characters out of 3178563
- 57117 words of memory out of 3000000
- 3950 multiletter control sequences out of 15000+200000
+ 250 strings out of 494887
+ 3251 string characters out of 3178563
+ 58117 words of memory out of 3000000
+ 3951 multiletter control sequences out of 15000+200000
  8848 words of font info for 31 fonts, out of 3000000 for 9000
  0 hyphenation exceptions out of 8191
- 22i,6n,19p,296b,193s stack positions out of 5000i,500n,10000p,200000b,50000s
-</home/ismael/.miktex/texmfs/install/fonts/type1/public/amsfonts/cm/cmbx12.pf
-b></home/ismael/.miktex/texmfs/install/fonts/type1/public/amsfonts/cm/cmr12.pfb
-></home/ismael/.miktex/texmfs/install/fonts/type1/public/amsfonts/cm/cmr17.pfb>
-</home/ismael/.miktex/texmfs/install/fonts/type1/public/amsfonts/cm/cmti12.pfb>
-
-Output written on relatorio_primeira_entrega.pdf (2 pages, 53635 bytes).
+ 22i,6n,19p,279b,193s stack positions out of 5000i,500n,10000p,200000b,50000s
+</home/ismael/.miktex/texmfs/install/fonts/type1/public/am
+sfonts/cm/cmbx12.pfb></home/ismael/.miktex/texmfs/install/fonts/type1/public/am
+sfonts/cm/cmr12.pfb></home/ismael/.miktex/texmfs/install/fonts/type1/public/ams
+fonts/cm/cmr17.pfb></home/ismael/.miktex/texmfs/install/fonts/type1/public/amsf
+onts/cm/cmti12.pfb>
+Output written on relatorio.pdf (2 pages, 58929 bytes).
 PDF statistics:
  25 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
