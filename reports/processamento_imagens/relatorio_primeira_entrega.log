@@ -1,0 +1,85 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7050) (preloaded format=pdflatex 2019.4.16)  21 OCT 2019 09:37
+entering extended mode
+**./relatorio_primeira_entrega.tex
+(relatorio_primeira_entrega.tex
+LaTeX2e <2018-04-01> patch level 5
+(/home/ismael/.miktex/texmfs/install/tex/latex/base/article.cls
+Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
+(/home/ismael/.miktex/texmfs/install/tex/latex/base/size12.clo
+File: size12.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count80
+\c@section=\count81
+\c@subsection=\count82
+\c@subsubsection=\count83
+\c@paragraph=\count84
+\c@subparagraph=\count85
+\c@figure=\count86
+\c@table=\count87
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+
+LaTeX Warning: Unused global option(s):
+    [a4].
+
+(relatorio_primeira_entrega.aux)
+\openout1 = `relatorio_primeira_entrega.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 7.
+LaTeX Font Info:    ... okay on input line 7.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 7.
+LaTeX Font Info:    ... okay on input line 7.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 7.
+LaTeX Font Info:    ... okay on input line 7.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 7.
+LaTeX Font Info:    ... okay on input line 7.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 7.
+LaTeX Font Info:    ... okay on input line 7.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 7.
+LaTeX Font Info:    ... okay on input line 7.
+ [1
+
+]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <14.4> on input line 10.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 10.
+
+
+LaTeX Warning: No \author given.
+
+[2{/home/ismael/.miktex/texmfs/data/pdftex/config/pdftex.map}]
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 23.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 23.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 23.
+
+Overfull \hbox (6.18718pt too wide) in paragraph at lines 28--33
+\OT1/cmr/m/n/12 binarizac~ao escolhida foi a binarizac~ao invertida. O tamanh
+o do bloco utilizado
+ []
+
+No file relatorio_primeira_entrega.bbl.
+[1] (relatorio_primeira_entrega.aux) ) 
+Here is how much of TeX's memory you used:
+ 245 strings out of 494887
+ 3243 string characters out of 3178563
+ 56117 words of memory out of 3000000
+ 3949 multiletter control sequences out of 15000+200000
+ 8501 words of font info for 30 fonts, out of 3000000 for 9000
+ 0 hyphenation exceptions out of 8191
+ 22i,6n,19p,296b,245s stack positions out of 5000i,500n,10000p,200000b,50000s
+</home/ismael/.miktex/texmfs/install/font
+s/type1/public/amsfonts/cm/cmbx12.pfb></home/ismael/.miktex/texmfs/install/font
+s/type1/public/amsfonts/cm/cmr12.pfb></home/ismael/.miktex/texmfs/install/fonts
+/type1/public/amsfonts/cm/cmr17.pfb>
+Output written on relatorio_primeira_entrega.pdf (3 pages, 43772 bytes).
+PDF statistics:
+ 24 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+

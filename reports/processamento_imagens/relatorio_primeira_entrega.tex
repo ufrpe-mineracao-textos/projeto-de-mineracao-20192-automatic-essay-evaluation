@@ -1,0 +1,35 @@
+\documentclass[12pt,a4]{article}
+
+
+\title{Detecção e extração de textos em imgens de redação, para avaliação de competências do ENEM}
+\date{}
+
+\begin{document}
+\begin{titlepage}
+\begin{center}
+\maketitle
+\textbf{Alunos}: Lucas Francisco Correia, Wilson Neto,  Ismael Cesar \\
+\textbf{Disciplina}: Processamento de imagens
+\end{center}
+\end{titlepage}
+
+\section{Introdução}
+\label{sec:introdcao}
+	Extrair textos de imagens pode ser uma atividade útil para realisação de tarefas como, tradução ou até mesmo digitalização de documentos.
+	Porém este trabalho tem um propósito específico de extração de textos de folhas de redação da prova do Exame nacional do Ensino Médio (ENEM).
+	Uma prova de nível nacional como o ENEM é realizada para centenas de milhares de candidatos, logo centenas de milhares de redações precisam ser avaliadas.
+	Extração de texto de folhas de redação para avaliação automática tem pode reduzir em muito o tempo necessário para que todas as redações sejam avaliadas bem como tornar desnecessário o uso de avaliadores, diminuindo os custos para o estado. 
+	Este trabalho foca em metodologias utilizadas para extração de textos em folhas de redações do ENEM.
+	Como base foi utilizado o conjunto de $31$ redações disponibilizados por estudantes na plataforma UOL. 
+	
+
+\section{Medotologia}
+\label{sec:metodologia}
+	A primeira etapa para extração de texto trata-se do préprocessamento. 
+	Como as imagens de redação já vem em um formato padronizado fora utilizada somente a técnica de limiarização adaptativa gaussiana. 
+	Onde o tipo de binarização escolhida foi a binarização invertida. 
+	O tamanho do bloco utilizado foi $21$.
+	E valor da constante utilizada no método de limiarização gaussiana foi $15$.
+
+\bibliography{bibliografia}
+\end{document}
