@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7050) (preloaded format=pdflatex 2019.4.16)  21 OCT 2019 10:28
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7050) (preloaded format=pdflatex 2019.4.16)  21 OCT 2019 13:39
 entering extended mode
 **./relatorio.tex
 (relatorio.tex
@@ -76,13 +76,13 @@ Here is how much of TeX's memory you used:
  3951 multiletter control sequences out of 15000+200000
  8848 words of font info for 31 fonts, out of 3000000 for 9000
  0 hyphenation exceptions out of 8191
- 22i,6n,19p,279b,193s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 22i,6n,19p,278b,193s stack positions out of 5000i,500n,10000p,200000b,50000s
 </home/ismael/.miktex/texmfs/install/fonts/type1/public/am
 sfonts/cm/cmbx12.pfb></home/ismael/.miktex/texmfs/install/fonts/type1/public/am
 sfonts/cm/cmr12.pfb></home/ismael/.miktex/texmfs/install/fonts/type1/public/ams
 fonts/cm/cmr17.pfb></home/ismael/.miktex/texmfs/install/fonts/type1/public/amsf
 onts/cm/cmti12.pfb>
-Output written on relatorio.pdf (2 pages, 58929 bytes).
+Output written on relatorio.pdf (2 pages, 58925 bytes).
 PDF statistics:
  25 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
