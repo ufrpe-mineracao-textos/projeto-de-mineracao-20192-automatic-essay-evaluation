@@ -5,43 +5,41 @@
 """
 import numpy as np
 from cogroo_interface import Cogroo
-from data_procedures import get_tfidf_of_essays
+from sklearn.model_selection import train_test_split
+from data_procedures import create_rules_id_dictionary, get_essays_texts_and_scores, get_tfidf_of_essays
 
 cogroo = Cogroo.Instance()
 
-def create_rules_id_dictionary(n_rules=129):
-    """
-    Creates a dictionary for the rules returned by the CoGroo API.
-    This dictionary is going to be used for when the rule is retuned for the API,
-    its id will come in the format: "xml:<number>", So based on the number stored in the corresponding
-    position of the id in format "xml:<number>" the value in the index of the rule in the feature vector
-    will be increased.
+def grammar_check_essays(essays):
+    rules_dict, rule_vect = create_rules_id_dictionary()
+    errors = []
+    for e in essays:
+        doc = cogroo.grammar_check(e)
+        mistakes = doc.mistakes
+        new_rule_vect = rule_vect.copy()
+        for m in mistakes:
+            # Excluding errors related to spacing in the texts
+            if 'space:' not in m.rule_id:
+                new_rule_vect[rules_dict[m.rule_id]] += 1
+        errors.append(new_rule_vect)
 
-    :param n_rules: number of rules
-    :return:
-    """
-    prefix = "xml:"
-    rules = {}
-    rules_vector = np.zeros((n_rules,))
-    for i in range(n_rules):
-        rules[prefix+str(i+1)] = i
-    return rules, rules_vector
-
+    return np.array(errors)
 
 def main():
-    rules_dict, rule_vector= create_rules_id_dictionary()
-    print("Rules dict")
-    print(rules_dict)
-    tfidfs = get_tfidf_of_essays()
-    print(tfidfs.shape)
-    # doc = cogroo.grammar_check(essay.text)
-    # mistakes = doc.mistakes
-    """
-    for m in mistakes:
-        if 'space' not in m.rule_id:
-            rule_index = rules_dict[m.rule_id]
-            print(rule_index)
-    """
+    essays, scores = get_essays_texts_and_scores()
+    X_train_texts, X_test_texts, Y_train_scores, Y_test_scores = train_test_split(essays, scores, test_size=0.3)
+
+    # Computing TF/IDF of Train and validation sets
+    X_train_tfidf = get_tfidf_of_essays(X_train_texts)
+    X_test_tfidf = get_tfidf_of_essays(X_test_texts)
+
+    # Grammar checking essays
+    train_errors = grammar_check_essays(X_train_texts)
+    test_errors  = grammar_check_essays(X_train_texts)
+    print(train_errors)
+
+
+
 
 if __name__ == "__main__":
     main()
