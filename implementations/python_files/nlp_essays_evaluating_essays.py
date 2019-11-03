@@ -4,13 +4,10 @@
     The instructions to run the CoGroo server can be found in the website https://github.com/gpassero/cogroo4py
 """
 import numpy as np
-import uol_redacoes_xml as uol
 from cogroo_interface import Cogroo
-from sklearn.feature_extraction.text import TfidfTransformer
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from data_procedures import get_tfidf_of_essays
 
 cogroo = Cogroo.Instance()
-
 
 def create_rules_id_dictionary(n_rules=129):
     """
@@ -25,26 +22,26 @@ def create_rules_id_dictionary(n_rules=129):
     """
     prefix = "xml:"
     rules = {}
+    rules_vector = np.zeros((n_rules,))
     for i in range(n_rules):
         rules[prefix+str(i+1)] = i
-    return rules
+    return rules, rules_vector
 
 
 def main():
-    rules_dict = create_rules_id_dictionary()
-    essays = uol.load()
-    print("Number of essays "+str(len(essays)))
+    rules_dict, rule_vector= create_rules_id_dictionary()
     print("Rules dict")
     print(rules_dict)
-
-    doc = cogroo.grammar_check(essays[122].text)
-    mistakes = doc.mistakes
-
+    tfidfs = get_tfidf_of_essays()
+    print(tfidfs.shape)
+    # doc = cogroo.grammar_check(essay.text)
+    # mistakes = doc.mistakes
+    """
     for m in mistakes:
         if 'space' not in m.rule_id:
             rule_index = rules_dict[m.rule_id]
             print(rule_index)
-
+    """
 
 if __name__ == "__main__":
     main()
