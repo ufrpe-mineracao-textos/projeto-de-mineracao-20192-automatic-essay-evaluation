@@ -10,6 +10,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
 nlp = spacy.load("pt")
 
+
 def create_rules_id_dictionary(n_rules=129):
     """
     Creates a dictionary for the rules returned by the CoGroo API.
@@ -22,7 +23,17 @@ def create_rules_id_dictionary(n_rules=129):
     :return:
     """
     prefix = "xml:"
+    # adding number of extra rules without a specific numerical ID
+    n_rules += 5
+
     rules = {}
+
+    rules['punctuation:BEFORE_SENTENCES'] = 0
+    rules['punctuation:EXTRA_PUNCTUATION'] = 0
+    rules['repetition:DUPLICATED_TOKEN'] = 0
+    rules['government:GOVERNMENT'] = 0
+    rules['probs:paronyms'] = 0
+
     rules_vector = np.zeros((n_rules,))
     for i in range(n_rules):
         rules[prefix+str(i+1)] = i

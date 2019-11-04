@@ -10,6 +10,7 @@ from data_procedures import create_rules_id_dictionary, get_essays_texts_and_sco
 
 cogroo = Cogroo.Instance()
 
+
 def grammar_check_essays(essays):
     rules_dict, rule_vect = create_rules_id_dictionary()
     errors = []
@@ -25,8 +26,10 @@ def grammar_check_essays(essays):
 
     return np.array(errors)
 
+
 def classification():
     essays, scores = get_essays_texts_and_scores()
+    essays, scores = essays[0:11], scores[0:11]
     X_train_texts, X_test_texts, Y_train_scores, Y_test_scores = train_test_split(essays, scores, test_size=0.3)
 
     # Computing TF/IDF of Train and validation sets
@@ -36,9 +39,8 @@ def classification():
     # Grammar checking essays
     train_errors = grammar_check_essays(X_train_texts)
     test_errors  = grammar_check_essays(X_train_texts)
-    print(train_errors)
 
-
+    
 
 
 if __name__ == "__main__":
