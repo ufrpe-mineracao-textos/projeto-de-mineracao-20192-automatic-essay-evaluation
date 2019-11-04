@@ -25,7 +25,7 @@ def grammar_check_essays(essays):
 
     return np.array(errors)
 
-def main():
+def classification():
     essays, scores = get_essays_texts_and_scores()
     X_train_texts, X_test_texts, Y_train_scores, Y_test_scores = train_test_split(essays, scores, test_size=0.3)
 
@@ -42,4 +42,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    classification()

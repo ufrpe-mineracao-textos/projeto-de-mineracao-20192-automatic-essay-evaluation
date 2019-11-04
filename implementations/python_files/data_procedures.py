@@ -4,9 +4,11 @@
 
 import numpy as np
 import uol_redacoes_xml as uol
+import spacy
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
+nlp = spacy.load("pt")
 
 def create_rules_id_dictionary(n_rules=129):
     """
@@ -56,11 +58,29 @@ def get_essays_texts_and_scores():
     return texts, np.array(scores)
 
 
-def get_tfidf_of_essays(texts):
+def get_tfidf_of_essays(texts, preprocess=False):
+    """
+    Performs the TF-IDF processing of the texts .
+    And takes the option preprocess to perform the preprocessing on the texts like tokenization, lemmatization,
+    and punctuation and stopword removal
+    :param texts:
+    :param preprocess:
+    :return:
+    """
+    data = []
+    if preprocess:
+        if type(texts) == list:
+            for t in texts:
+                tokens = nlp(t)
+                non_stop_tokens = [t for t in tokens if not (t.is_stop or t.is_punct)]
+                lemmas = [nst.lemma_.lower() for nst in non_stop_tokens]
+                data.append(lemmas)
+    else:
+        data = texts
 
     count_vectorizer = CountVectorizer(encoding='latin-1')
     tfidf_transformer = TfidfTransformer(use_idf=True)
-    count_vect = count_vectorizer.fit_transform(texts)
+    count_vect = count_vectorizer.fit_transform(data)
     tfidf = tfidf_transformer.fit_transform(count_vect).toarray()
 
     return tfidf
