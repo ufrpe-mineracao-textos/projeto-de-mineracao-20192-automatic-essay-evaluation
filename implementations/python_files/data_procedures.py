@@ -69,6 +69,12 @@ def get_essays_texts_and_scores():
     return texts, np.array(scores)
 
 
+# Dummy function necessary to use the count vectorizer with inputs already tokenized and lemmatized
+# with stop words removed
+def dummy_fun(doc):
+    return doc
+
+
 def get_tfidf_of_essays(texts, preprocess=False):
     """
     Performs the TF-IDF processing of the texts .
@@ -89,10 +95,23 @@ def get_tfidf_of_essays(texts, preprocess=False):
     else:
         data = texts
 
-    count_vectorizer = CountVectorizer(encoding='latin-1')
+    count_vectorizer = CountVectorizer(tokenizer=dummy_fun, preprocessor=dummy_fun, token_pattern=None, encoding='latin-1')
     tfidf_transformer = TfidfTransformer(use_idf=True)
     count_vect = count_vectorizer.fit_transform(data)
     tfidf = tfidf_transformer.fit_transform(count_vect).toarray()
 
     return tfidf
 
+
+def concatenate_tfidf_errors_arrays(tfidf, errors):
+    """
+    Concatenate the TF-IDF arrays to the errors arrays after the grammar checking is performed using cogroo.
+
+    :param tfidf: Tf-IDF arrays of essays
+    :param errors: Error Array of essays
+    :return: A numpy array of the new features which are the Tf-IDF arrays concatenated to the Error arrays
+    """
+    new_features = []
+    for f, e in zip(tfidf, errors):
+        new_features.append(np.concatenate([f, e]))
+    return np.array(new_features)
