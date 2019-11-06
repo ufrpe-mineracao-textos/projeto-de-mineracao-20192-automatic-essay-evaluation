@@ -44,20 +44,19 @@ def get_train_test_features(essays, scores, test_size=.3):
     :param test_size: Size of the test set
     :return: Features corresponding to the train and test set
     """
-    X_train_texts, X_test_texts, Y_train_scores, Y_test_scores = train_test_split(essays, scores, test_size=test_size)
+    # Grammar checking essays
+    detected_errors = grammar_check_essays(essays)
 
     # Computing TF/IDF of Train and validation sets
-    X_train_tfidf = get_tfidf_of_essays(X_train_texts, preprocess=True)
-    X_test_tfidf = get_tfidf_of_essays(X_test_texts, preprocess=True)
+    x_tfidf = get_tfidf_of_essays(essays, preprocess=True)
 
-    # Grammar checking essays
-    train_errors = grammar_check_essays(X_train_texts)
-    test_errors  = grammar_check_essays(X_train_texts)
+    # Concatenating detected errors with the TF-IDF of texts
+    detected_features = concatenate_tfidf_errors_arrays(x_tfidf, detected_errors)
 
-    train_features = concatenate_tfidf_errors_arrays(X_train_tfidf, train_errors)
-    test_features = concatenate_tfidf_errors_arrays(X_test_tfidf, test_errors)
+    x_train_tfidf, x_test_tfidf, y_train_scores, y_test_scores = train_test_split(detected_features, scores,
+                                                                                  test_size=test_size)
 
-    return train_features, test_features
+    return (x_train_tfidf, y_train_scores), (x_test_tfidf, y_test_scores)
 
 
 def classification():
@@ -65,9 +64,13 @@ def classification():
 
     train_features, test_features = get_train_test_features(essays[0:11], scores[0:11])
 
-    print(train_features.shape)
-    print(test_features.shape)
-
+    print("Train Type", type(test_features))
+    print("Train data shape: ", train_features[0].shape)
+    print("Train Size", len(test_features))
+    print("Test Type", type(test_features))
+    print("Test data shape: ", test_features[0].shape)
+    print("Test Size", len(test_features))
+    
 
 if __name__ == "__main__":
     classification()
