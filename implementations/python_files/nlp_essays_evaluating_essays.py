@@ -7,6 +7,10 @@ import numpy as np
 from cogroo_interface import Cogroo
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
+from sklearn.utils import shuffle
+from models import res_model
+import keras
+from keras.utils import to_categorical
 from data_procedures import create_rules_id_dictionary, get_essays_texts_and_scores
 from data_procedures import get_tfidf_of_essays, concatenate_tfidf_errors_arrays
 
@@ -104,5 +108,42 @@ def regression(verbose=False):
     print("Error standard deviation: ", stdd)
 
 
+def classification(verbose=False):
+    essays_number = 100
+    essays, scores = get_essays_texts_and_scores()
+
+    essays, scores = shuffle(essays, scores)
+
+    (x_train, y_train), (x_test, y_test) = get_train_test_features(essays[0:essays_number], scores[0:essays_number],
+                                                                   verbose=verbose)
+    if verbose:
+        print("[INFO] Setitng scores from competence 1 appart from the others")
+    y_train_c1 = y_train[:, 1]
+    y_test_c1 = y_test[:, 1]
+
+    if verbose:
+        print("[INFO] using categorized classes")
+
+    # classes 0.0 ,0.5, 1.0, 1.5, 2.0
+    n_classes = 5
+    y_cat_train_c1 = to_categorical(y_train_c1, n_classes)
+    y_cat_test_c1 = to_categorical(y_test_c1, n_classes)
+
+    if verbose:
+        print("[INFO] Creating the machine learning model")
+
+    model = res_model(x_train.shape[1:], n_classes)
+
+    model.compile(loss="categorical_crossentropy",
+                  optimizer=keras.optimizers.SGD(lr=.1, momentum=.3),
+                  metrics=['accuracy'])
+
+    batch_size = 10
+    n_epochs = 10
+    H = model.fit(x_train, y_cat_train_c1, batch_size=batch_size, epochs=n_epochs,
+                  validation_data=(x_test, y_cat_test_c1), shuffle=True, verbose=1)
+
+
 if __name__ == "__main__":
-    regression(verbose=True)
+    # regression(verbose=True)
+    classification(verbose=True)
