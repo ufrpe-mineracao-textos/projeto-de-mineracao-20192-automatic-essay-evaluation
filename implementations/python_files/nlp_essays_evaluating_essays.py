@@ -4,12 +4,12 @@
     The instructions to run the CoGroo server can be found in the website https://github.com/gpassero/cogroo4py
 """
 import numpy as np
+import keras
 from cogroo_interface import Cogroo
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.utils import shuffle
-from models import res_model
-import keras
+from models import res_model, evaluate_model
 from keras.utils import to_categorical
 from data_procedures import create_rules_id_dictionary, get_essays_texts_and_scores
 from data_procedures import get_tfidf_of_essays, concatenate_tfidf_errors_arrays
@@ -99,7 +99,8 @@ def regression(verbose=False):
 
     error = predictions - y_test_c1
     mean_error = error.sum()/predictions.shape[0]
-    stdd = np.sqrt(((error - mean_error)**2).sum()/error.shape[0])# standard deviation
+    # standard deviation
+    stdd = np.sqrt(((error - mean_error)**2).sum()/error.shape[0])
 
     R2_SCORE = 1 - squared_dum_regression/squared_sum_desired
 
@@ -140,8 +141,10 @@ def classification(verbose=False):
 
     batch_size = 10
     n_epochs = 10
-    H = model.fit(x_train, y_cat_train_c1, batch_size=batch_size, epochs=n_epochs,
+    h = model.fit(x_train, y_cat_train_c1, batch_size=batch_size, epochs=n_epochs,
                   validation_data=(x_test, y_cat_test_c1), shuffle=True, verbose=1)
+
+    evaluate_model(x_test, y_cat_test_c1, batch_size, model, n_epochs, h, n_classes, save_results=True)
 
 
 if __name__ == "__main__":

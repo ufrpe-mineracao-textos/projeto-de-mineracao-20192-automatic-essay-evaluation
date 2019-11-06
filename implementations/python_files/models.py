@@ -8,7 +8,26 @@ from keras.layers import Input
 from keras.models import Model
 from keras.layers.merge import concatenate
 import matplotlib.pyplot as plt
+from sklearn.metrics import classification_report
 
+
+def calculate_mean_and_stdd(list_of_values):
+    """
+    Calculates the mean and standard deviation of a set
+    :param list_of_values:
+    :return: mean and standard deviation
+    """
+    mean = 0
+    stdd = 0
+    set_size = len(list_of_values)
+    for acc in list_of_values:
+        mean += acc
+    mean = mean/set_size
+    for acc in list_of_values:
+        stdd += np.power(acc - mean, 2)
+    stdd = np.sqrt(stdd/set_size)
+
+    return mean, stdd
 
 def res_model(input_shape, n_classses):
 
@@ -31,7 +50,9 @@ def res_model(input_shape, n_classses):
 
     return model
 
-def evaluate_model(test_data, test_labels, batch_size, model, n_epochs, H, n_classes, folder_name, save_results=False):
+
+def evaluate_model(test_data, test_labels, batch_size, model, n_epochs, H, n_classes,
+                   folder_name='results/', save_results=False):
     ## Evaluating model
     print("[INFO] Evaluating Network")
 
@@ -58,14 +79,11 @@ def evaluate_model(test_data, test_labels, batch_size, model, n_epochs, H, n_cla
     plt.plot(np.arange(0, n_epochs), H.history["val_loss"], label="val_loss")
     plt.plot(np.arange(0, n_epochs), H.history["acc"], label="train_acc")
     plt.plot(np.arange(0, n_epochs), H.history["val_acc"], label="val_acc")
-    if window_size != "":
-        plt.title("Training Loss and Accuracy Window "+window_size)
-    else:
-        plt.title("Training Loss and Accuracy")
+    plt.title("Training Loss and Accuracy ")
     plt.xlabel("Epoch #")
     plt.ylabel("Loss/Accuracy")
     plt.legend()
 
     if save_results:
-        plt.savefig(window_file + "LossAccComparison.png")
+        plt.savefig(folder_name + "LossAccComparison.png")
         plt.close('all')
