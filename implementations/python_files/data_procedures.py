@@ -75,17 +75,20 @@ def dummy_fun(doc):
     return doc
 
 
-def get_tfidf_of_essays(texts, preprocess=False):
+def get_tfidf_of_essays(texts, preprocess=False, verbose=False):
     """
     Performs the TF-IDF processing of the texts .
     And takes the option preprocess to perform the preprocessing on the texts like tokenization, lemmatization,
     and punctuation and stopword removal
     :param texts:
     :param preprocess:
-    :return:
+    :return: tf-idf vectors of the texts passed as input
     """
     data = []
     if preprocess:
+        if verbose:
+            print("[INFO] Preprocessing texts of each essay, performing tokenization," +
+                  " lemmatization and stop word removal")
         if type(texts) == list:
             for t in texts:
                 tokens = nlp(t)
@@ -93,8 +96,12 @@ def get_tfidf_of_essays(texts, preprocess=False):
                 lemmas = [nst.lemma_.lower() for nst in non_stop_tokens]
                 data.append(lemmas)
     else:
+        if verbose:
+            print("[INFO] Using raw texts as input to TF-IDF vectorizers")
         data = texts
 
+    if verbose:
+        print("[INFO] Transforming input texts into vectors")
     count_vectorizer = CountVectorizer(tokenizer=dummy_fun, preprocessor=dummy_fun, token_pattern=None, encoding='latin-1')
     tfidf_transformer = TfidfTransformer(use_idf=True)
     count_vect = count_vectorizer.fit_transform(data)
@@ -103,7 +110,7 @@ def get_tfidf_of_essays(texts, preprocess=False):
     return tfidf
 
 
-def concatenate_tfidf_errors_arrays(tfidf, errors):
+def concatenate_tfidf_errors_arrays(tfidf, errors, verbose=False):
     """
     Concatenate the TF-IDF arrays to the errors arrays after the grammar checking is performed using cogroo.
 

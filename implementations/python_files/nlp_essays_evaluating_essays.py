@@ -6,6 +6,7 @@
 import numpy as np
 from cogroo_interface import Cogroo
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
 from data_procedures import create_rules_id_dictionary, get_essays_texts_and_scores
 from data_procedures import get_tfidf_of_essays, concatenate_tfidf_errors_arrays
 
@@ -35,7 +36,7 @@ def grammar_check_essays(essays):
     return np.array(errors)
 
 
-def get_train_test_features(essays, scores, test_size=.3):
+def get_train_test_features(essays, scores, test_size=.3, verbose=False):
     """
     Calculates the train and test set features for the essays loaded.
     The features are the concatenation of the TF-IDF of the essays, with their corresponding error vectors
@@ -44,14 +45,22 @@ def get_train_test_features(essays, scores, test_size=.3):
     :param test_size: Size of the test set
     :return: Features corresponding to the train and test set
     """
-    # Grammar checking essays
+    if verbose:
+        print("[INFO] Grammar checking essays")
     detected_errors = grammar_check_essays(essays)
 
-    # Computing TF/IDF of Train and validation sets
-    x_tfidf = get_tfidf_of_essays(essays, preprocess=True)
+    if verbose:
+        print("Computing TF/IDF of Train and validation sets")
 
-    # Concatenating detected errors with the TF-IDF of texts
+    x_tfidf = get_tfidf_of_essays(essays, preprocess=True, verbose=verbose)
+
+    if verbose:
+        print("Concatenating detected errors with the TF-IDF of texts")
+
     detected_features = concatenate_tfidf_errors_arrays(x_tfidf, detected_errors)
+
+    if verbose:
+        print("Spliting train and test dataset, with test set size percentage of "+str(test_size))
 
     x_train_tfidf, x_test_tfidf, y_train_scores, y_test_scores = train_test_split(detected_features, scores,
                                                                                   test_size=test_size)
@@ -59,18 +68,34 @@ def get_train_test_features(essays, scores, test_size=.3):
     return (x_train_tfidf, y_train_scores), (x_test_tfidf, y_test_scores)
 
 
-def classification():
+def regression(verbose=False):
+    essays_number = 100
     essays, scores = get_essays_texts_and_scores()
 
-    train_features, test_features = get_train_test_features(essays[0:11], scores[0:11])
+    (x_train, y_train), (x_test, y_test) = get_train_test_features(essays[0:essays_number], scores[0:essays_number],
+                                                                   verbose=verbose)
+    if verbose:
+        print("[INFO] Setitng scores from competence 1 appart from the others")
+    y_train_c1 = y_train[:, 1]
+    y_test_c1 = y_test[:, 1]
 
-    print("Train Type", type(test_features))
-    print("Train data shape: ", train_features[0].shape)
-    print("Train Size", len(test_features))
-    print("Test Type", type(test_features))
-    print("Test data shape: ", test_features[0].shape)
-    print("Test Size", len(test_features))
-    
+    if verbose:
+        print("[INFO] Performing linear regression over the data")
+    reg = LinearRegression()
+    reg.fit(x_train, y_train_c1)
+
+    if verbose:
+        print("[INFO] Computing the R2 score of the predictions")
+
+    predictions = reg.predict(x_test)
+
+    mean_scores = y_test_c1.sum()/y_test_c1.shape[0]
+    squared_sum_desired = ((y_test_c1 - mean_scores)**2).sum()
+    squared_dum_regression = ((y_test_c1 - predictions)**2).sum()
+
+    R2_SCORE = 1 - squared_dum_regression/squared_sum_desired
+
+    print("R2 for a linear model: ", R2_SCORE)
 
 if __name__ == "__main__":
-    classification()
+    regression(verbose=True)
