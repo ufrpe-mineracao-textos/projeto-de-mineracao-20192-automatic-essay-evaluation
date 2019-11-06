@@ -93,9 +93,16 @@ def regression(verbose=False):
     squared_sum_desired = ((y_test_c1 - mean_scores)**2).sum()
     squared_dum_regression = ((y_test_c1 - predictions)**2).sum()
 
+    error = predictions - y_test_c1
+    mean_error = error.sum()/predictions.shape[0]
+    stdd = np.sqrt(((error - mean_error)**2).sum()/error.shape[0])# standard deviation
+
     R2_SCORE = 1 - squared_dum_regression/squared_sum_desired
 
     print("R2 for a linear model: ", R2_SCORE)
+    print("Mean error: ", mean_error)
+    print("Error standard deviation: ", stdd)
+
 
 if __name__ == "__main__":
     regression(verbose=True)
