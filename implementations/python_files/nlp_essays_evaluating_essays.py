@@ -12,7 +12,7 @@ from sklearn.utils import shuffle
 from models import res_model, evaluate_model
 from keras.utils import to_categorical
 from data_procedures import create_rules_id_dictionary, get_essays_texts_and_scores
-from data_procedures import get_tfidf_of_essays, concatenate_tfidf_errors_arrays
+from data_procedures import get_tfidf_of_essays_with_traintest_split, concatenate_tfidf_errors_arrays
 
 cogroo = Cogroo.Instance()
 
@@ -56,7 +56,7 @@ def get_train_test_features(essays, scores, test_size=.3, verbose=False):
     if verbose:
         print("Computing TF/IDF of Train and validation sets")
 
-    x_tfidf = get_tfidf_of_essays(essays, preprocess=True, verbose=verbose)
+    x_tfidf = get_tfidf_of_essays_with_traintest_split(essays, preprocess=True, verbose=verbose)
 
     if verbose:
         print("Concatenating detected errors with the TF-IDF of texts")
@@ -70,6 +70,32 @@ def get_train_test_features(essays, scores, test_size=.3, verbose=False):
                                                                                   test_size=test_size)
 
     return (x_train_tfidf, y_train_scores), (x_test_tfidf, y_test_scores)
+
+
+def get_tfidf_of_essays_without_data_split(essays, verbose=True):
+    """
+    Calculates the train and test set features for the essays loaded.
+    The features are the concatenation of the TF-IDF of the essays, with their corresponding error vectors.
+    All that without performing data spliting
+    :param texts:
+    :param preprocess:
+    :return: tf-idf vectors of the texts passed as input
+    """
+    if verbose:
+        print("[INFO] Grammar checking essays")
+    detected_errors = grammar_check_essays(essays)
+
+    if verbose:
+        print("Computing TF/IDF of Train and validation sets")
+
+    x_tfidf = get_tfidf_of_essays_with_traintest_split(essays, preprocess=True, verbose=verbose)
+
+    if verbose:
+        print("Concatenating detected errors with the TF-IDF of texts")
+
+    detected_features = concatenate_tfidf_errors_arrays(x_tfidf, detected_errors)
+
+    return detected_features
 
 
 def regression(verbose=False):

@@ -5,6 +5,7 @@
 import numpy as np
 import uol_redacoes_xml as uol
 import spacy
+import csv
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
@@ -75,7 +76,7 @@ def dummy_fun(doc):
     return doc
 
 
-def get_tfidf_of_essays(texts, preprocess=False, verbose=False):
+def get_tfidf_of_essays_with_traintest_split(texts, preprocess=False, verbose=False):
     """
     Performs the TF-IDF processing of the texts .
     And takes the option preprocess to perform the preprocessing on the texts like tokenization, lemmatization,
@@ -122,3 +123,11 @@ def concatenate_tfidf_errors_arrays(tfidf, errors, verbose=False):
     for f, e in zip(tfidf, errors):
         new_features.append(np.concatenate([f, e]))
     return np.array(new_features)
+
+
+def save_csv(array, file_path="", file_name="detected_features.csv"):
+
+    with open(file_path+file_name) as f:
+        csv_writer = csv.writer(f)
+        csv_writer.writerows(array)
+        f.close()
