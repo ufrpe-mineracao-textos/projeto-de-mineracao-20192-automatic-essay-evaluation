@@ -210,7 +210,7 @@ def regression(features, scores, test_size=.3, save_path='results/',
     if verbose:
         print("[INFO] Spliting data into test and train")
 
-    x_train, x_test, y_train, y_test = train_test_split(features, scores[:, 1], test_size=test_size)
+    x_train, x_test, y_train, y_test = train_test_split(features, scores, test_size=test_size)
 
     if verbose:
         print("[INFO] Setitng scores from competence 1 appart from the others")
