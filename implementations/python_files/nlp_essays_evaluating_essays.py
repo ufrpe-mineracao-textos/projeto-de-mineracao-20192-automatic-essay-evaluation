@@ -3,16 +3,21 @@
     Before running this file, make sure the server to use the cogroo api is running in your computer.
     The instructions to run the CoGroo server can be found in the website https://github.com/gpassero/cogroo4py
 """
+import os
+import sys
+sys.path.append("../")
+import csv
 import numpy as np
 import keras
 from cogroo_interface import Cogroo
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.utils import shuffle
-from models import res_model, evaluate_model
+from sklearn.preprocessing import StandardScaler
+from models import res_model, simple_model, evaluate_model
 from keras.utils import to_categorical
-from data_procedures import create_rules_id_dictionary, get_essays_texts_and_scores
-from data_procedures import get_tfidf_of_essays_with_traintest_split, concatenate_tfidf_errors_arrays
+from data_procedures import create_rules_id_dictionary, get_essays_texts_and_scores, save_csv
+from data_procedures import get_tfidf_of_essays, concatenate_tfidf_errors_arrays
 
 cogroo = Cogroo.Instance()
 
@@ -29,12 +34,15 @@ def grammar_check_essays(essays):
     errors = []
     for e in essays:
         doc = cogroo.grammar_check(e)
-        mistakes = doc.mistakes
+        # mistakes = doc.mistakes
         new_rule_vect = rule_vect.copy()
-        for m in mistakes:
-            # Excluding errors related to spacing in the texts
-            if 'space:' not in m.rule_id:
-                new_rule_vect[rules_dict[m.rule_id]] += 1
+
+        if doc is not None:
+            mistakes = doc.mistakes
+            for m in mistakes:
+                # Excluding errors related to spacing in the texts
+                if 'space:' not in m.rule_id:
+                    new_rule_vect[rules_dict[m.rule_id]] += 1
         errors.append(new_rule_vect)
 
     return np.array(errors)
@@ -56,7 +64,7 @@ def get_train_test_features(essays, scores, test_size=.3, verbose=False):
     if verbose:
         print("Computing TF/IDF of Train and validation sets")
 
-    x_tfidf = get_tfidf_of_essays_with_traintest_split(essays, preprocess=True, verbose=verbose)
+    x_tfidf = get_tfidf_of_essays(essays, preprocess=True, verbose=verbose)
 
     if verbose:
         print("Concatenating detected errors with the TF-IDF of texts")
@@ -88,7 +96,7 @@ def get_tfidf_of_essays_without_data_split(essays, verbose=True):
     if verbose:
         print("Computing TF/IDF of Train and validation sets")
 
-    x_tfidf = get_tfidf_of_essays_with_traintest_split(essays, preprocess=True, verbose=verbose)
+    x_tfidf = get_tfidf_of_essays(essays, preprocess=True, verbose=verbose)
 
     if verbose:
         print("Concatenating detected errors with the TF-IDF of texts")
@@ -98,12 +106,33 @@ def get_tfidf_of_essays_without_data_split(essays, verbose=True):
     return detected_features
 
 
-def regression(verbose=False):
-    essays_number = 100
-    essays, scores = get_essays_texts_and_scores()
+def regression(features, scores, test_size=.3, verbose=False, normalize=True):
+    """
+    Performs linear regression to the features
 
-    (x_train, y_train), (x_test, y_test) = get_train_test_features(essays[0:essays_number], scores[0:essays_number],
-                                                                   verbose=verbose)
+    :param features: array of data features
+    :param scores:  array of scores per competence
+    :param test_size: percentage indicating the size of the test set
+    :param verbose: indicate the user's desire of verbosity
+    :param normalize: indicate the user's desire for normalizing data
+    :return: regression model
+    """
+
+    features, scores = shuffle(features, scores, random_state=0)
+
+    if normalize:
+        if verbose:
+            print("[INFO] Normalizing Data")
+        scaler = StandardScaler()
+        scaler.fit(features)
+        features = scaler.transform(features)
+
+    
+    if verbose:
+        print("[INFO] Spliting data into test and train")
+
+    (x_train, y_train), (x_test, y_test) = train_test_split(features, scores, test_size=test_size)
+
     if verbose:
         print("[INFO] Setitng scores from competence 1 appart from the others")
     y_train_c1 = y_train[:, 1]
@@ -121,58 +150,145 @@ def regression(verbose=False):
 
     mean_scores = y_test_c1.sum()/y_test_c1.shape[0]
     squared_sum_desired = ((y_test_c1 - mean_scores)**2).sum()
-    squared_dum_regression = ((y_test_c1 - predictions)**2).sum()
+    squared_sum_regression = ((y_test_c1 - predictions)**2).sum()
 
     error = predictions - y_test_c1
     mean_error = error.sum()/predictions.shape[0]
     # standard deviation
     stdd = np.sqrt(((error - mean_error)**2).sum()/error.shape[0])
 
-    R2_SCORE = 1 - squared_dum_regression/squared_sum_desired
+    R2_SCORE = 1 - squared_sum_regression/squared_sum_desired
 
-    print("R2 for a linear model: ", R2_SCORE)
-    print("Mean error: ", mean_error)
-    print("Error standard deviation: ", stdd)
+    if verbose:
+        print("R2 for a linear model: ", R2_SCORE)
+        print("Desired squared sum: ", squared_sum_desired)
+        print("Desired sum regression", squared_sum_regression)
+        print("Mean error: ", mean_error)
+        print("Error standard deviation: ", stdd)
+
+    return reg
 
 
-def classification(verbose=False):
-    essays_number = 100
+def grammacheck_and_run_models(option_reg_class=True, verbose=False):
     essays, scores = get_essays_texts_and_scores()
 
     essays, scores = shuffle(essays, scores)
 
-    (x_train, y_train), (x_test, y_test) = get_train_test_features(essays[0:essays_number], scores[0:essays_number],
-                                                                   verbose=verbose)
+    features = get_tfidf_of_essays_without_data_split(essays, verbose=verbose)
+
+    if option_reg_class:
+        classification(features, scores, 5, verbose)
+    else:
+        regression(features, scores, verbose=verbose)
+
+
+def classification(features, scores, n_classes, model_type=0, save_path='results/',
+                   lr=.01, batch_size=10, n_epochs=20, test_size=.3,
+                   verbose=False, save_results=False, normalize=True):
+    """
+    Performs the data spliting and the training of a classification model.
+    :param features: array of feature vectors
+    :param scores: array of scores per competenec
+    :param n_classes: classes number
+    :param model_type: model choice. The options are a simple Deep MLP model and a Residual model
+    :param save_path: Path to which the results should be saved
+    :param lr: learning rate
+    :param batch_size:  Size of the batch
+    :param n_epochs: Number of training epochs
+    :param test_size: Percentage of the test set
+    :param verbose: option to indicate the desire of verbosity
+    :param save_results: options to indicate  the user desire to save the results in the path
+    :param normalize: option to the user to normalize the data or not
+    :return: the trained model
+    """
+    # features, scores = read_data_from_csv()
+    verbose_opc = 0
     if verbose:
-        print("[INFO] Setitng scores from competence 1 appart from the others")
-    y_train_c1 = y_train[:, 1]
-    y_test_c1 = y_test[:, 1]
+        print("[INFO] Shuffle Data")
+        verbose_opc = 1
+
+    features, scores = shuffle(features,scores, random_state=0)
+
+    if normalize:
+        if verbose:
+            print("[INFO] Normalizing Data")
+        scaler = StandardScaler()
+        scaler.fit(features)
+        features = scaler.transform(features)
 
     if verbose:
-        print("[INFO] using categorized classes")
+        print("[INFO] Splitting data into train and test sets")
+    x_train, x_test, y_train, y_test = train_test_split(features, scores[:, 1], test_size=test_size)
 
     # classes 0.0 ,0.5, 1.0, 1.5, 2.0
-    n_classes = 5
-    y_cat_train_c1 = to_categorical(y_train_c1, n_classes)
-    y_cat_test_c1 = to_categorical(y_test_c1, n_classes)
+    y_cat_train = to_categorical(y_train, n_classes)
+    y_cat_test = to_categorical(y_test,n_classes)
 
     if verbose:
         print("[INFO] Creating the machine learning model")
-
-    model = res_model(x_train.shape[1:], n_classes)
+    
+    if model_type == 0:
+        model = res_model(x_train.shape[1:],n_classes)
+    if model_type == 1:
+        model = simple_model(x_train.shape[1:], n_classes)
 
     model.compile(loss="categorical_crossentropy",
-                  optimizer=keras.optimizers.SGD(lr=.1, momentum=.3),
+                  optimizer=keras.optimizers.SGD(lr=lr, momentum=.3),
                   metrics=['accuracy'])
 
-    batch_size = 10
-    n_epochs = 10
-    h = model.fit(x_train, y_cat_train_c1, batch_size=batch_size, epochs=n_epochs,
-                  validation_data=(x_test, y_cat_test_c1), shuffle=True, verbose=1)
+    h = model.fit(x_train, y_cat_train, 
+                  batch_size=batch_size,
+                  epochs=n_epochs,
+                  validation_data=(x_test, y_cat_test),
+                  verbose=verbose_opc)
 
-    evaluate_model(x_test, y_cat_test_c1, batch_size, model, n_epochs, h, n_classes, save_results=True)
+    evaluate_model(x_test, y_cat_test, batch_size, model, n_epochs, h, n_classes, folder_name=save_path,
+                   save_results=save_results)
+
+    return model
+
+
+def save_data_into_a_csv(verbose=False):
+    essays, scores = get_essays_texts_and_scores()
+    if verbose:
+        print("[INFO] GETTING TF-IDF of texts without data spliting")
+    data_features = get_tfidf_of_essays_without_data_split(essays,verbose=True)
+
+    if verbose:
+        print("[INFO] Saving data into csv files")
+        print("[INFO] Saving FEATURES")
+
+    save_csv(data_features)
+
+    if verbose:
+        print("[INFO] Saving scores")
+    save_csv(scores, file_name="scores_of_features.csv")
+
+
+def read_data_from_csv(features_file="detected_features.csv", scores_file="scores_of_features.csv"):
+
+    features = None
+    if os.path.exists(features_file):
+        with open(features_file, 'r') as f:
+            features = np.genfromtxt(f, delimiter=',')
+            f.close()
+    else:
+        raise Exception("File "+features_file+" does not exist")
+
+    scores_of_features = None
+    if os.path.exists(scores_file):
+        with open(scores_file, 'r') as f:
+            scores_of_features = np.genfromtxt(f, delimiter=',')
+            f.close()
+    else:
+        raise Exception("File "+scores_file+" does not exist")
+
+    return features, scores_of_features
 
 
 if __name__ == "__main__":
     # regression(verbose=True)
-    classification(verbose=True)
+    # classification(verbose=True)
+    # save_data_into_a_csv()
+    features, scores = read_data_from_csv()
+    classification(features, scores, 5, save_results=True)

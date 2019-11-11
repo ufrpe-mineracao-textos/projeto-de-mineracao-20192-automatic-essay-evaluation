@@ -76,7 +76,7 @@ def dummy_fun(doc):
     return doc
 
 
-def get_tfidf_of_essays_with_traintest_split(texts, preprocess=False, verbose=False):
+def get_tfidf_of_essays(texts, preprocess=False, verbose=False):
     """
     Performs the TF-IDF processing of the texts .
     And takes the option preprocess to perform the preprocessing on the texts like tokenization, lemmatization,
@@ -127,7 +127,10 @@ def concatenate_tfidf_errors_arrays(tfidf, errors, verbose=False):
 
 def save_csv(array, file_path="", file_name="detected_features.csv"):
 
-    with open(file_path+file_name) as f:
+    if '.csv' not in file_name:
+        file_name += '.csv'
+
+    with open(file_path+file_name, 'w+') as f:
         csv_writer = csv.writer(f)
         csv_writer.writerows(array)
         f.close()

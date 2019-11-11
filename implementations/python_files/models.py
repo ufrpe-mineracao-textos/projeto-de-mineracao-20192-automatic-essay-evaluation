@@ -29,24 +29,39 @@ def calculate_mean_and_stdd(list_of_values):
 
     return mean, stdd
 
+
 def res_model(input_shape, n_classses):
 
     x_input = Input(input_shape)
     x_skip = Dense(input_shape[0], use_bias=True, activation='relu', name="input_layer")(x_input)
-    x = Dense(150, use_bias=True, activation='relu', name="second_layer")(x_skip)
-    x = Dense(150, use_bias=True, activation='relu', name="third_layer")(x)
-    #x = Add(name="add_layer")([x, x_skip])
+    x = Dense(150, use_bias=True, activation='tanh', name="second_layer")(x_skip)
+    x = Dense(150, use_bias=True, activation='tanh', name="third_layer")(x)
+    x = Dropout(.25)(x)
     x = concatenate([x, x_skip])
     x_skip = Dense(150+input_shape[0], use_bias=True, activation='relu')(x)
-    x = Dense(100, use_bias=True, activation='relu')(x_skip)
-    x = Dense(100, use_bias=True, activation='relu')(x)
-    # x = Add()([x, x_skip])
+    x = Dense(100, use_bias=True, activation='tanh')(x_skip)
+    x = Dense(100, use_bias=True, activation='tanh')(x)
+    x = Dropout(.25)(x)
     x = concatenate([x, x_skip])
-    x = Dense(100, use_bias=True, activation='relu')(x)
-    x = Dense(100, use_bias=True, activation='relu')(x)
+    x = Dense(100, use_bias=True, activation='tanh')(x)
+    x = Dense(100, use_bias=True, activation='tanh')(x)
     x = Dense(n_classses, use_bias=True, activation='softmax')(x)
 
     model = Model(inputs=x_input, outputs=x, name="res_model")
+
+    return model
+
+
+def simple_model(input_shape, n_classes):
+    
+    x_input = Input(input_shape)
+    x = Dense(input_shape[0], use_bias=True, activation='tanh', name='input_layer')(x_input)
+    x = Dense(200, use_bias=True, activation='tanh')(x)
+    x = Dense(200, use_bias=True, activation='tanh')(x)
+    x = Dense(200, use_bias=True, activation='tanh')(x)
+    x = Dense(n_classes, use_bias=True, activation='softmax')
+
+    model = Model(inputs=x_input, outputs=x, name='simple_model')
 
     return model
 
@@ -63,7 +78,7 @@ def evaluate_model(test_data, test_labels, batch_size, model, n_epochs, H, n_cla
         train_mean_acc, train_stdd_acc = calculate_mean_and_stdd(H.history["acc"])
         val_mean_acc, val_stdd_acc = calculate_mean_and_stdd(H.history["val_acc"])
 
-        with open("eval.txt", 'w') as f:
+        with open(folder_name+"eval.txt", 'w') as f:
             predictions = model.predict(test_data, batch_size=batch_size)
             value = classification_report(test_labels.argmax(axis=1),
                                           predictions.argmax(axis=1))
