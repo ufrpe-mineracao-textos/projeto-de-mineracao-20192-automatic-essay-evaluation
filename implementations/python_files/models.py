@@ -37,11 +37,10 @@ def res_model(input_shape, n_classses):
     x = Dense(100, use_bias=True, activation='relu', name="second_layer")(x_skip)
     x = Dense(100, use_bias=True, activation='relu', name="third_layer")(x)
     x = concatenate([x, x_skip])
-    x_skip = Dense(150+input_shape[0], use_bias=True, activation='relu')(x)
+    x_skip = Dense(150, use_bias=True, activation='relu')(x)
     x = Dense(100, use_bias=True, activation='relu')(x_skip)
     x = Dense(100, use_bias=True, activation='relu')(x)
     x = concatenate([x, x_skip])
-    x = Dense(100, use_bias=True, activation='relu')(x)
     x = Dense(n_classses, use_bias=True, activation='softmax')(x)
 
     model = Model(inputs=x_input, outputs=x, name="res_model")
