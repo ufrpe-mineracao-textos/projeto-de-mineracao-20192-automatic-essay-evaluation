@@ -106,7 +106,8 @@ def get_tfidf_of_essays_without_data_split(essays, verbose=True):
     return detected_features
 
 
-def regression(features, scores, test_size=.3, verbose=False, normalize=True):
+def regression(features, scores, test_size=.3, save_path='results/',
+               verbose=False, normalize=True, save_results=True):
     """
     Performs linear regression to the features
 
@@ -160,11 +161,26 @@ def regression(features, scores, test_size=.3, verbose=False, normalize=True):
     R2_SCORE = 1 - squared_sum_regression/squared_sum_desired
 
     if verbose:
-        print("R2 for a linear model: ", R2_SCORE)
-        print("Desired squared sum: ", squared_sum_desired)
-        print("Desired sum regression", squared_sum_regression)
-        print("Mean error: ", mean_error)
-        print("Error standard deviation: ", stdd)
+        print("[RESULT] R2 for a linear model: ", R2_SCORE)
+        print("[RESULT] Desired squared sum: ", squared_sum_desired)
+        print("[RESULT] Desired sum regression: ", squared_sum_regression)
+        print("[RESULT] Mean error: ", mean_error)
+        print("[RESULT] Error standard deviation: ", stdd)
+
+    if save_results:
+        if verbose:
+            print("[INFO] Saving Results")
+        if not os.path.exists(save_path):
+            os.mkdir(save_path)
+
+        with open(save_path+"eval_regression.txt", 'w') as f:
+            string_output = "R2 for a linear model: " + str(R2_SCORE)+" \n"
+            string_output += "Desired squared sum: " + str(squared_sum_desired) + " \n"
+            string_output += "Desired sum regression: " + str(squared_sum_regression) + " \n"
+            string_output += "Mean error: " + str(mean_error) + " \n"
+            string_output += "Error standard deviation: " + str(stdd) + " \n"
+            f.write(string_output)
+            f.close()
 
     return reg
 
