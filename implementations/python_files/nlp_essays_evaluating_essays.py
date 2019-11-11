@@ -106,85 +106,6 @@ def get_tfidf_of_essays_without_data_split(essays, verbose=True):
     return detected_features
 
 
-def regression(features, scores, test_size=.3, save_path='results/',
-               verbose=False, normalize=True, save_results=True):
-    """
-    Performs linear regression to the features
-
-    :param features: array of data features
-    :param scores:  array of scores per competence
-    :param test_size: percentage indicating the size of the test set
-    :param verbose: indicate the user's desire of verbosity
-    :param normalize: indicate the user's desire for normalizing data
-    :return: regression model
-    """
-
-    features, scores = shuffle(features, scores, random_state=0)
-
-    if normalize:
-        if verbose:
-            print("[INFO] Normalizing Data")
-        scaler = StandardScaler()
-        scaler.fit(features)
-        features = scaler.transform(features)
-
-    
-    if verbose:
-        print("[INFO] Spliting data into test and train")
-
-    x_train, x_test, y_train, y_test = train_test_split(features, scores[:, 1], test_size=test_size)
-
-    if verbose:
-        print("[INFO] Setitng scores from competence 1 appart from the others")
-    y_train_c1 = y_train[:, 1]
-    y_test_c1 = y_test[:, 1]
-
-    if verbose:
-        print("[INFO] Performing linear regression over the data")
-    reg = LinearRegression()
-    reg.fit(x_train, y_train_c1)
-
-    if verbose:
-        print("[INFO] Computing the R2 score of the predictions")
-
-    predictions = reg.predict(x_test)
-
-    mean_scores = y_test_c1.sum()/y_test_c1.shape[0]
-    squared_sum_desired = ((y_test_c1 - mean_scores)**2).sum()
-    squared_sum_regression = ((y_test_c1 - predictions)**2).sum()
-
-    error = predictions - y_test_c1
-    mean_error = error.sum()/predictions.shape[0]
-    # standard deviation
-    stdd = np.sqrt(((error - mean_error)**2).sum()/error.shape[0])
-
-    R2_SCORE = 1 - squared_sum_regression/squared_sum_desired
-
-    if verbose:
-        print("[RESULT] R2 for a linear model: ", R2_SCORE)
-        print("[RESULT] Desired squared sum: ", squared_sum_desired)
-        print("[RESULT] Desired sum regression: ", squared_sum_regression)
-        print("[RESULT] Mean error: ", mean_error)
-        print("[RESULT] Error standard deviation: ", stdd)
-
-    if save_results:
-        if verbose:
-            print("[INFO] Saving Results")
-        if not os.path.exists(save_path):
-            os.mkdir(save_path)
-
-        with open(save_path+"eval_regression.txt", 'w') as f:
-            string_output = "R2 for a linear model: " + str(R2_SCORE)+" \n"
-            string_output += "Desired squared sum: " + str(squared_sum_desired) + " \n"
-            string_output += "Desired sum regression: " + str(squared_sum_regression) + " \n"
-            string_output += "Mean error: " + str(mean_error) + " \n"
-            string_output += "Error standard deviation: " + str(stdd) + " \n"
-            f.write(string_output)
-            f.close()
-
-    return reg
-
-
 def grammacheck_and_run_models(option_reg_class=True, verbose=False):
     essays, scores = get_essays_texts_and_scores()
 
@@ -223,7 +144,7 @@ def classification(features, scores, n_classes, model_type=0, save_path='results
         print("[INFO] Shuffle Data")
         verbose_opc = 1
 
-    features, scores = shuffle(features,scores, random_state=0)
+    features, scores = shuffle(features, scores, random_state=0)
 
     if normalize:
         if verbose:
@@ -262,6 +183,84 @@ def classification(features, scores, n_classes, model_type=0, save_path='results
                    save_results=save_results)
 
     return model
+
+
+def regression(features, scores, test_size=.3, save_path='results/',
+               verbose=False, normalize=True, save_results=True):
+    """
+    Performs linear regression to the features
+
+    :param features: array of data features
+    :param scores:  array of scores per competence
+    :param test_size: percentage indicating the size of the test set
+    :param verbose: indicate the user's desire of verbosity
+    :param normalize: indicate the user's desire for normalizing data
+    :return: regression model
+    """
+
+    features, scores = shuffle(features, scores, random_state=0)
+
+    if normalize:
+        if verbose:
+            print("[INFO] Normalizing Data")
+        scaler = StandardScaler()
+        scaler.fit(features)
+        features = scaler.transform(features)
+
+    if verbose:
+        print("[INFO] Spliting data into test and train")
+
+    x_train, x_test, y_train, y_test = train_test_split(features, scores[:, 1], test_size=test_size)
+
+    if verbose:
+        print("[INFO] Setitng scores from competence 1 appart from the others")
+    y_train_c1 = y_train[:, 1]
+    y_test_c1 = y_test[:, 1]
+
+    if verbose:
+        print("[INFO] Performing linear regression over the data")
+    reg = LinearRegression()
+    reg.fit(x_train, y_train_c1)
+
+    if verbose:
+        print("[INFO] Computing the R2 score of the predictions")
+
+    predictions = reg.predict(x_test)
+
+    mean_scores = y_test_c1.sum() / y_test_c1.shape[0]
+    squared_sum_desired = ((y_test_c1 - mean_scores) ** 2).sum()
+    squared_sum_regression = ((y_test_c1 - predictions) ** 2).sum()
+
+    error = predictions - y_test_c1
+    mean_error = error.sum() / predictions.shape[0]
+    # standard deviation
+    stdd = np.sqrt(((error - mean_error) ** 2).sum() / error.shape[0])
+
+    R2_SCORE = 1 - squared_sum_regression / squared_sum_desired
+
+    if verbose:
+        print("[RESULT] R2 for a linear model: ", R2_SCORE)
+        print("[RESULT] Desired squared sum: ", squared_sum_desired)
+        print("[RESULT] Desired sum regression: ", squared_sum_regression)
+        print("[RESULT] Mean error: ", mean_error)
+        print("[RESULT] Error standard deviation: ", stdd)
+
+    if save_results:
+        if verbose:
+            print("[INFO] Saving Results")
+        if not os.path.exists(save_path):
+            os.mkdir(save_path)
+
+        with open(save_path + "eval_regression.txt", 'w') as f:
+            string_output = "R2 for a linear model: " + str(R2_SCORE) + " \n"
+            string_output += "Desired squared sum: " + str(squared_sum_desired) + " \n"
+            string_output += "Desired sum regression: " + str(squared_sum_regression) + " \n"
+            string_output += "Mean error: " + str(mean_error) + " \n"
+            string_output += "Error standard deviation: " + str(stdd) + " \n"
+            f.write(string_output)
+            f.close()
+
+    return reg
 
 
 def save_data_into_a_csv(verbose=False):
