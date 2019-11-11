@@ -36,12 +36,10 @@ def res_model(input_shape, n_classses):
     x_skip = Dense(input_shape[0], use_bias=True, activation='relu', name="input_layer")(x_input)
     x = Dense(150, use_bias=True, activation='tanh', name="second_layer")(x_skip)
     x = Dense(150, use_bias=True, activation='tanh', name="third_layer")(x)
-    x = Dropout(.25)(x)
     x = concatenate([x, x_skip])
     x_skip = Dense(150+input_shape[0], use_bias=True, activation='relu')(x)
     x = Dense(100, use_bias=True, activation='tanh')(x_skip)
     x = Dense(100, use_bias=True, activation='tanh')(x)
-    x = Dropout(.25)(x)
     x = concatenate([x, x_skip])
     x = Dense(100, use_bias=True, activation='tanh')(x)
     x = Dense(100, use_bias=True, activation='tanh')(x)
@@ -56,10 +54,10 @@ def simple_model(input_shape, n_classes):
     
     x_input = Input(input_shape)
     x = Dense(input_shape[0], use_bias=True, activation='tanh', name='input_layer')(x_input)
-    x = Dense(200, use_bias=True, activation='tanh')(x)
-    x = Dense(200, use_bias=True, activation='tanh')(x)
-    x = Dense(200, use_bias=True, activation='tanh')(x)
-    x = Dense(n_classes, use_bias=True, activation='softmax')(x)
+    x = Dense(200, use_bias=True, activation='tanh', name="dense_1")(x)
+    x = Dense(200, use_bias=True, activation='tanh', name="dense_2")(x)
+    x = Dense(200, use_bias=True, activation='tanh', name="dense_3")(x)
+    x = Dense(n_classes, use_bias=True, activation='softmax', name="output_layer")(x)
 
     model = Model(inputs=x_input, outputs=x, name='simple_model')
 

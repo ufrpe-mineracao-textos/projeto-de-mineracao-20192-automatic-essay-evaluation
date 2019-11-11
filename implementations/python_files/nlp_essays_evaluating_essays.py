@@ -307,4 +307,4 @@ if __name__ == "__main__":
     # classification(verbose=True)
     # save_data_into_a_csv()
     features, scores = read_data_from_csv()
-    classification(features, scores, 5, save_results=True)
+    classification(features[0:10], scores[0:10], 5, model_type=1, save_results=True)
