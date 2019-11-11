@@ -244,7 +244,7 @@ def classification(features, scores, n_classes, model_type=0, save_path='results
         print("[INFO] Creating the machine learning model")
     
     if model_type == 0:
-        model = res_model(x_train.shape[1:],n_classes)
+        model = res_model(x_train.shape[1:], n_classes)
     if model_type == 1:
         model = simple_model(x_train.shape[1:], n_classes)
 

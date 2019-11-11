@@ -59,7 +59,7 @@ def simple_model(input_shape, n_classes):
     x = Dense(200, use_bias=True, activation='tanh')(x)
     x = Dense(200, use_bias=True, activation='tanh')(x)
     x = Dense(200, use_bias=True, activation='tanh')(x)
-    x = Dense(n_classes, use_bias=True, activation='softmax')
+    x = Dense(n_classes, use_bias=True, activation='softmax')(x)
 
     model = Model(inputs=x_input, outputs=x, name='simple_model')
 
