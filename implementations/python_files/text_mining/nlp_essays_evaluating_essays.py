@@ -6,7 +6,6 @@
 import os
 import sys
 sys.path.append("../")
-import csv
 import numpy as np
 import keras
 from cogroo_interface import Cogroo
@@ -14,10 +13,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.utils import shuffle
 from sklearn.preprocessing import StandardScaler
-from models import res_model, simple_model, evaluate_model
+from text_mining.models import res_model, simple_model, evaluate_model
 from keras.utils import to_categorical
-from data_procedures import create_rules_id_dictionary, get_essays_texts_and_scores, save_csv
-from data_procedures import get_tfidf_of_essays, concatenate_tfidf_errors_arrays
+from text_mining.data_procedures import create_rules_id_dictionary, get_essays_texts_and_scores, save_csv
+from text_mining.data_procedures import get_tfidf_of_essays, concatenate_tfidf_errors_arrays
 
 cogroo = Cogroo.Instance()
 
