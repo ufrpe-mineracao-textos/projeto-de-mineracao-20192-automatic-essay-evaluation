@@ -14,8 +14,6 @@
 import os
 import sys
 import pandas as pd
-user_folder = "user_name"
-datasets_folder = "dataset_download"
 
 
 def set_datset_directories(IAM_DIR = "", IAM_TEXT_DIR = "", NIST_DIR = "", EMNIST_DIR = ""):
@@ -35,7 +33,8 @@ def set_datset_directories(IAM_DIR = "", IAM_TEXT_DIR = "", NIST_DIR = "", EMNIS
     sys.path.append(EMNIST)
 
 
-def create_iam_dataset_path_list():
+def create_iam_dataset_path_list(custom_iam_path='IAM-dataset/inlineImages/',
+                                 custom_iam_text_path='IAM-dataset/ascii/'):
     """
     Each parent directory of this dataset has a set of sub directories, each subdirectory has its corresponding
     sub subdirectory which it contains two or more images, which when put together they form a phrase.
@@ -49,21 +48,21 @@ def create_iam_dataset_path_list():
             All the texts is united by phrase, which means a certain set of images in an especific folder of
             IAM dataset will actually compose the phrase of the text file in the IAM_TEXT path
     """
-    global IAM, IAM_TEXT
+    #global IAM, IAM_TEXT
     phrases_list = []
     text_paths_list = []
-    for subdirs, dirs, files in os.walk(IAM):
+    for subdirs, dirs, files in os.walk(custom_iam_path):
         if len(files) != 0:
-            phrases_list.append((subdirs, files))
+            phrases_list.append((subdirs+'/', files))
 
-    for subdirs, dirs, files in os.walk(IAM_TEXT):
+    for subdirs, dirs, files in os.walk(custom_iam_text_path):
         if len(files) != 0:
-            text_paths_list.append((subdirs, files))
+            text_paths_list.append((subdirs+'/', files))
 
     return phrases_list, text_paths_list
 
 
-def create_nist_dataset_path_list():
+def create_nist_dataset_path_list(custom_nist_path='NIST/'):
     """
     Each parent directory of this dataset has a set of sub directories, each subdirectory has its corresponding
     sub subdirectory which it contains two or more images, which when put together they form a phrase.
@@ -74,9 +73,8 @@ def create_nist_dataset_path_list():
     :return: A list of tuples, with the first element being the folder where the images can be found, and
             the second element of the tuple is the images' names
     """
-    global NIST
     paths_list = []
-    for subdir, dir, files in os.walk(NIST):
+    for subdir, dir, files in os.walk(custom_nist_path):
 
         if len(files) != 0 and all('.mit' in w for w in files):
             images_paths = []
@@ -93,22 +91,3 @@ def create_nist_dataset_path_list():
             paths_list.append((subdir+'/', images_paths))
 
     return paths_list
-
-
-if __name__ == "__main__":
-    NIST = "/home/" + user_folder + "/" + datasets_folder + "/NIST"
-    IAM = "/home/" + user_folder + "/" + datasets_folder + "/IAM-dataset/lineImages/"
-    IAM_TEXT = "/home/" + user_folder + "/" + datasets_folder + "/IAM-dataset/ascii/"
-    EMNIST = "/home/" + user_folder + "/" + datasets_folder + "/EMNIST"
-    set_datset_directories(IAM, IAM_TEXT, NIST, EMNIST)
-    paths_lists = create_nist_dataset_path_list()
-
-    print('\n', len(paths_lists))
-
-
-if __name__ == "data_procedures":
-    NIST = "/home/" + user_folder + "/" + datasets_folder + "/NIST"
-    IAM = "/home/" + user_folder + "/" + datasets_folder + "/IAM-dataset/lineImages/"
-    IAM_TEXT = "/home/"+user_folder+"/"+datasets_folder+"/IAM-dataset/ascii/"
-    EMNIST = "/home/" + user_folder + "/" + datasets_folder + "/EMNIST"
-    set_datset_directories(IAM, IAM_TEXT, NIST, EMNIST)
