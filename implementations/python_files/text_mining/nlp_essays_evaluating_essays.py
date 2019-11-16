@@ -158,9 +158,7 @@ def classification(features, scores, n_classes, model_type=0, save_path='results
         print("[INFO] Splitting data into train and test sets")
     x_train, x_test, y_train, y_test = train_test_split(features, scores[:, 1], test_size=test_size)
 
-    # classes 0.0 ,0.5, 1.0, 1.5, 2.0
-    y_cat_train = to_categorical(y_train, n_classes)
-    y_cat_test = to_categorical(y_test,n_classes)
+
 
     if verbose:
         print("[INFO] Creating the machine learning model")
@@ -181,6 +179,10 @@ def classification(features, scores, n_classes, model_type=0, save_path='results
 
     h = None
     if model_type >= 0 and model_type <= 1:
+        # classes 0.0 ,0.5, 1.0, 1.5, 2.0
+        y_cat_train = to_categorical(y_train, n_classes)
+        y_cat_test = to_categorical(y_test, n_classes)
+
         model.compile(loss="categorical_crossentropy",
                       optimizer=keras.optimizers.SGD(lr=lr, momentum=.3),
                       metrics=['accuracy'])
@@ -190,11 +192,14 @@ def classification(features, scores, n_classes, model_type=0, save_path='results
                       epochs=n_epochs,
                       validation_data=(x_test, y_cat_test),
                       verbose=verbose_opc)
-    else:
-         model.fit(x_train, y_cat_train)
 
-    evaluate_model(x_test, y_cat_test, batch_size, model, n_epochs, h, n_classes, folder_name=save_path,
-                   save_results=save_results)
+        evaluate_model(x_test, y_cat_test, batch_size, model, n_epochs, h, n_classes, folder_name=save_path,
+                       save_results=save_results)
+    else:
+         model.fit(x_train, y_train)
+
+         evaluate_model(x_test, y_test, batch_size, model, n_epochs, h, n_classes, folder_name=save_path,
+                        save_results=save_results)
 
     return model
 
