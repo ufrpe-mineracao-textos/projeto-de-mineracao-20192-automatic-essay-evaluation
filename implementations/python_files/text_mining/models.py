@@ -71,8 +71,9 @@ def evaluate_model(test_data, test_labels, batch_size, model, n_epochs, H, n_cla
         os.mkdir(folder_name)
 
     if save_results:
-        train_mean_acc, train_stdd_acc = calculate_mean_and_stdd(H.history["acc"])
-        val_mean_acc, val_stdd_acc = calculate_mean_and_stdd(H.history["val_acc"])
+        if H is not None:
+            train_mean_acc, train_stdd_acc = calculate_mean_and_stdd(H.history["acc"])
+            val_mean_acc, val_stdd_acc = calculate_mean_and_stdd(H.history["val_acc"])
 
         with open(folder_name+"eval.txt", 'w') as f:
             predictions = model.predict(test_data, batch_size=batch_size)
@@ -84,17 +85,18 @@ def evaluate_model(test_data, test_labels, batch_size, model, n_epochs, H, n_cla
             f.write(value)
             f.close()
 
-    plt.style.use("ggplot")
-    plt.figure()
-    plt.plot(np.arange(0, n_epochs), H.history["loss"], label="train_loss")
-    plt.plot(np.arange(0, n_epochs), H.history["val_loss"], label="val_loss")
-    plt.plot(np.arange(0, n_epochs), H.history["acc"], label="train_acc")
-    plt.plot(np.arange(0, n_epochs), H.history["val_acc"], label="val_acc")
-    plt.title("Training Loss and Accuracy ")
-    plt.xlabel("Epoch #")
-    plt.ylabel("Loss/Accuracy")
-    plt.legend()
+    if H is not None:
+        plt.style.use("ggplot")
+        plt.figure()
+        plt.plot(np.arange(0, n_epochs), H.history["loss"], label="train_loss")
+        plt.plot(np.arange(0, n_epochs), H.history["val_loss"], label="val_loss")
+        plt.plot(np.arange(0, n_epochs), H.history["acc"], label="train_acc")
+        plt.plot(np.arange(0, n_epochs), H.history["val_acc"], label="val_acc")
+        plt.title("Training Loss and Accuracy ")
+        plt.xlabel("Epoch #")
+        plt.ylabel("Loss/Accuracy")
+        plt.legend()
 
-    if save_results:
-        plt.savefig(folder_name + "LossAccComparison.png")
-        plt.close('all')
+        if save_results:
+            plt.savefig(folder_name + "LossAccComparison.png")
+            plt.close('all')

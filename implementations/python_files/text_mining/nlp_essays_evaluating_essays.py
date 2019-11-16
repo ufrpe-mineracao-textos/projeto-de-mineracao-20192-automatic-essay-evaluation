@@ -9,6 +9,7 @@ sys.path.append("../")
 import numpy as np
 import keras
 from cogroo_interface import Cogroo
+import sklearn
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.utils import shuffle
@@ -162,21 +163,32 @@ def classification(features, scores, n_classes, model_type=0, save_path='results
 
     if verbose:
         print("[INFO] Creating the machine learning model")
-    
+
+    model = None
     if model_type == 0:
         model = res_model(x_train.shape[1:], n_classes)
-    if model_type == 1:
+    elif model_type == 1:
         model = simple_model(x_train.shape[1:], n_classes)
+    elif model_type == 2:
+        model = sklearn.svm.SVC(gamma='auto')
+    elif model_type == 3:
+        model = sklearn.ensemble.forest.RandomForestClassifier()
+    elif model_type == 4:
+        model = sklearn.ensemble.weight_boosting.AdaBoostClassifier()
 
-    model.compile(loss="categorical_crossentropy",
-                  optimizer=keras.optimizers.SGD(lr=lr, momentum=.3),
-                  metrics=['accuracy'])
+    h = None
+    if model_type >= 0 and model_type <= 1:
+        model.compile(loss="categorical_crossentropy",
+                      optimizer=keras.optimizers.SGD(lr=lr, momentum=.3),
+                      metrics=['accuracy'])
 
-    h = model.fit(x_train, y_cat_train, 
-                  batch_size=batch_size,
-                  epochs=n_epochs,
-                  validation_data=(x_test, y_cat_test),
-                  verbose=verbose_opc)
+        h = model.fit(x_train, y_cat_train,
+                      batch_size=batch_size,
+                      epochs=n_epochs,
+                      validation_data=(x_test, y_cat_test),
+                      verbose=verbose_opc)
+    else:
+         model.fit(x_train, y_cat_train)
 
     evaluate_model(x_test, y_cat_test, batch_size, model, n_epochs, h, n_classes, folder_name=save_path,
                    save_results=save_results)
@@ -301,8 +313,14 @@ def read_data_from_csv(features_file="detected_features.csv", scores_file="score
 
 
 if __name__ == "__main__":
-    # regression(verbose=True)
-    # classification(verbose=True)
-    # save_data_into_a_csv()
+
+    models_types = {'res_net': 0,
+                    'mlp': 1,
+                    'svm': 2,
+                    'random_forest': 3,
+                    'ada_boost': 4,
+                    'xgboost': 5}
+
+    models_names = list(models_types.keys())
     features, scores = read_data_from_csv()
-    classification(features[0:10], scores[0:10], 5, model_type=1, save_results=True)
+    classification(features[0:10], scores[0:10], 5, model_type= models_types[models_names[1]], save_results=True)
