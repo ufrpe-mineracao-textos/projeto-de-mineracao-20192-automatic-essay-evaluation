@@ -4,8 +4,8 @@
     The instructions to run the CoGroo server can be found in the website https://github.com/gpassero/cogroo4py
 """
 import os
-import sys
-sys.path.append("../")
+# import sys
+# sys.path.append("../")
 import numpy as np
 import keras
 from cogroo_interface import Cogroo
@@ -15,10 +15,10 @@ from sklearn.linear_model import LinearRegression
 from sklearn.utils import shuffle
 from sklearn.preprocessing import StandardScaler
 import xgboost as xgb
-from text_mining.models import res_model, simple_model, evaluate_model
+from models import res_model, simple_model, evaluate_model
 from keras.utils import to_categorical
-from text_mining.data_procedures import create_rules_id_dictionary, get_essays_texts_and_scores, save_csv
-from text_mining.data_procedures import get_tfidf_of_essays, concatenate_tfidf_errors_arrays
+from data_procedures import create_rules_id_dictionary, get_essays_texts_and_scores, save_csv
+from data_procedures import get_tfidf_of_essays, concatenate_tfidf_errors_arrays, discretize_labels
 
 cogroo = Cogroo.Instance()
 
@@ -196,10 +196,13 @@ def classification(features, scores, n_classes, model_type=0, save_path='results
         evaluate_model(x_test, y_cat_test, batch_size, model, n_epochs, h, n_classes, folder_name=save_path,
                        save_results=save_results)
     else:
-         model.fit(x_train, y_train)
+        y_train = discretize_labels(y_train)
+        y_test = discretize_labels(y_test)
 
-         evaluate_model(x_test, y_test, batch_size, model, n_epochs, h, n_classes, folder_name=save_path,
-                        save_results=save_results)
+        model.fit(x_train, y_train)
+
+        evaluate_model(x_test, y_test, batch_size, model, n_epochs, h, n_classes, folder_name=save_path,
+                       save_results=save_results)
 
     return model
 
@@ -331,4 +334,5 @@ if __name__ == "__main__":
 
     models_names = list(models_types.keys())
     features, scores = read_data_from_csv()
-    classification(features[0:10], scores[0:10], 5, model_type= models_types[models_names[1]], save_results=True)
+    classification(features[0:10], scores[0:10], 5, model_type= models_types[models_names[2]], save_results=False)
+
