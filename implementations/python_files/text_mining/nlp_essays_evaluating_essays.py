@@ -10,6 +10,8 @@ import numpy as np
 import keras
 from cogroo_interface import Cogroo
 import sklearn
+from sklearn.ensemble.forest import RandomForestClassifier
+from sklearn.ensemble.weight_boosting import AdaBoostClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.utils import shuffle
@@ -171,9 +173,9 @@ def classification(features, scores, n_classes, model_type=0, save_path='results
     elif model_type == 2:
         model = sklearn.svm.SVC(gamma='auto')
     elif model_type == 3:
-        model = sklearn.ensemble.forest.RandomForestClassifier()
+        model = RandomForestClassifier()
     elif model_type == 4:
-        model = sklearn.ensemble.weight_boosting.AdaBoostClassifier()
+        model = AdaBoostClassifier()
     elif model_type == 5:
         model = xgb.XGBClassifier(objective="multi:softprob", random_state=42)
 
@@ -334,5 +336,7 @@ if __name__ == "__main__":
 
     models_names = list(models_types.keys())
     features, scores = read_data_from_csv()
-    classification(features[0:10], scores[0:10], 5, model_type= models_types[models_names[2]], save_results=False)
+    classification(features[0:10], scores[0:10], 5, model_type= models_types[models_names[5]],
+                   save_results=False,
+                   verbose=True)
 

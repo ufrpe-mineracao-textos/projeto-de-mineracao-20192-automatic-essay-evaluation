@@ -70,18 +70,21 @@ def evaluate_model(test_data, test_labels, batch_size, model, n_epochs, H, n_cla
     if save_results and not os.path.exists(folder_name):
         os.mkdir(folder_name)
 
+    predictions = model.predict(test_data)
+    value = classification_report(test_labels,
+                                  predictions)
+
+    print(value)
+
     if save_results:
         if H is not None:
             train_mean_acc, train_stdd_acc = calculate_mean_and_stdd(H.history["acc"])
             val_mean_acc, val_stdd_acc = calculate_mean_and_stdd(H.history["val_acc"])
+            value += "\nTrain acc mean: " + str(train_mean_acc) + "\t ,Train acc stdd: " + str(train_stdd_acc)
+            value += "\nValidation acc mean: " + str(val_mean_acc) + "\t ,Validation acc stdd: " + str(
+                val_stdd_acc) + "\n\n"
 
         with open(folder_name+"eval.txt", 'w') as f:
-            predictions = model.predict(test_data, batch_size=batch_size)
-            value = classification_report(test_labels.argmax(axis=1),
-                                          predictions.argmax(axis=1))
-            value += "\nTrain acc mean: "+str(train_mean_acc)+"\t ,Train acc stdd: "+str(train_stdd_acc)
-            value += "\nValidation acc mean: " + str(val_mean_acc) + "\t ,Validation acc stdd: " + str(val_stdd_acc)+ "\n\n"
-            print(value)
             f.write(value)
             f.close()
 

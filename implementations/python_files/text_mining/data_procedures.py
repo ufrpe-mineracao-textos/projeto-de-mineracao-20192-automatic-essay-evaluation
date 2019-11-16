@@ -154,4 +154,4 @@ def discretize_labels(y, verbose=False):
         elif l > 1.5 and l <= 2.0:
             new_y.append(4)
 
-    return new_y
+    return np.array(new_y)
