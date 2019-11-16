@@ -14,6 +14,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.utils import shuffle
 from sklearn.preprocessing import StandardScaler
+import xgboost as xgb
 from text_mining.models import res_model, simple_model, evaluate_model
 from keras.utils import to_categorical
 from text_mining.data_procedures import create_rules_id_dictionary, get_essays_texts_and_scores, save_csv
@@ -175,6 +176,8 @@ def classification(features, scores, n_classes, model_type=0, save_path='results
         model = sklearn.ensemble.forest.RandomForestClassifier()
     elif model_type == 4:
         model = sklearn.ensemble.weight_boosting.AdaBoostClassifier()
+    elif model_type == 5:
+        model = xgb.XGBClassifier(objective="multi:softprob", random_state=42)
 
     h = None
     if model_type >= 0 and model_type <= 1:
