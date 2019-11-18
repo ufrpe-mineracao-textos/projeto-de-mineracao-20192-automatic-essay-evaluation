@@ -8,6 +8,7 @@ import spacy
 import csv
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.preprocessing import OneHotEncoder
 
 nlp = spacy.load("pt")
 
@@ -141,17 +142,9 @@ def discretize_labels(y, verbose=False):
         Discretize the scores of the competence chosen, in order to perform the classification. 
         return: A discretized array of the labels, with five different classes
     """
-    new_y = []
-    for l in y:
-        if l == 0:
-            new_y.append(0)
-        elif l > 0 and l <= 0.5:
-            new_y.append(1)
-        elif l > 0.5 and l <= 1.0:
-            new_y.append(2)
-        elif l > 1.0 and l <= 1.5:
-            new_y.append(3)
-        elif l > 1.5 and l <= 2.0:
-            new_y.append(4)
-
-    return np.array(new_y)
+    y[y[:] == 0.0] = 0
+    y[y[:] == 0.5] = 1
+    y[y[:] == 1.0] = 2
+    y[y[:] == 1.5] = 3
+    y[y[:] == 2.0] = 4
+    return y.dtype(np.int32)

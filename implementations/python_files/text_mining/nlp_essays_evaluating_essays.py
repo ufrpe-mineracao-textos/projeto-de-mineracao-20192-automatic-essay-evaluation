@@ -199,9 +199,6 @@ def classification(features, scores, n_classes, model_type=0, save_path='results
         evaluate_model(x_test, y_cat_test, batch_size, model, n_epochs, h, n_classes, folder_name=save_path,
                        save_results=save_results)
     else:
-        #y_train = discretize_labels(y_train)
-        #y_test = discretize_labels(y_test)
-
         model.fit(x_train, y_train)
 
         evaluate_model(x_test, y_test, batch_size, model, n_epochs, h, n_classes, folder_name=save_path,
@@ -337,7 +334,8 @@ if __name__ == "__main__":
 
     models_names = list(models_types.keys())
     features, scores = read_data_from_csv()
-    classification(features[0:10], scores[0:10], 5, model_type= models_types[models_names[5]],
+    scores = discretize_labels(scores[0:10][:, 1])
+    classification(features[0:10], scores, 5, model_type=models_types[models_names[2]],
                    save_results=False,
                    verbose=True)
 
