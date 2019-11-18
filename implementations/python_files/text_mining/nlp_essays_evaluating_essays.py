@@ -185,8 +185,9 @@ def classification(features, scores, n_classes, model_type=0, save_path='results
         y_cat_train = to_categorical(y_train, n_classes)
         y_cat_test = to_categorical(y_test, n_classes)
 
-        model.compile(loss="categorical_crossentropy",
-                      optimizer=keras.optimizers.SGD(lr=lr, momentum=.3),
+        model.compile(loss="logcosh",
+                      #optimizer=keras.optimizers.SGD(lr=lr, momentum=.3),
+                      optimizer="adamax",
                       metrics=['accuracy'])
 
         h = model.fit(x_train, y_cat_train,
