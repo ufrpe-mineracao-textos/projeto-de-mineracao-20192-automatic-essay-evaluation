@@ -158,7 +158,7 @@ def classification(features, scores, n_classes, model_type=0, save_path='results
 
     if verbose:
         print("[INFO] Splitting data into train and test sets")
-    x_train, x_test, y_train, y_test = train_test_split(features, scores[:, 1], test_size=test_size)
+    x_train, x_test, y_train, y_test = train_test_split(features, scores, test_size=test_size)
 
 
 
