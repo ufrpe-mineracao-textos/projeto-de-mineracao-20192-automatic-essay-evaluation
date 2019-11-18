@@ -199,8 +199,8 @@ def classification(features, scores, n_classes, model_type=0, save_path='results
         evaluate_model(x_test, y_cat_test, batch_size, model, n_epochs, h, n_classes, folder_name=save_path,
                        save_results=save_results)
     else:
-        y_train = discretize_labels(y_train)
-        y_test = discretize_labels(y_test)
+        #y_train = discretize_labels(y_train)
+        #y_test = discretize_labels(y_test)
 
         model.fit(x_train, y_train)
 
