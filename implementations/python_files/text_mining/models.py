@@ -63,16 +63,23 @@ def simple_model(input_shape, n_classes):
 
 
 def evaluate_model(test_data, test_labels, batch_size, model, n_epochs, H, n_classes,
-                   folder_name='results/', save_results=False):
+                   folder_name='results/', save_results=False,
+                   is_rna=False):
     ## Evaluating model
     print("[INFO] Evaluating Network")
 
     if save_results and not os.path.exists(folder_name):
         os.mkdir(folder_name)
 
-    predictions = model.predict(test_data)
-    value = classification_report(test_labels,
-                                  predictions)
+    if is_rna:
+        predictions = model.predict(test_data)
+        value = classification_report(test_labels.argmax(axis=1),
+                                      predictions.argmax(axis=1))
+    else:
+        predictions = model.predict(test_data)
+        value = classification_report(test_labels,
+                                      predictions)
+
 
     print(value)
 

@@ -197,7 +197,7 @@ def classification(features, scores, n_classes, model_type=0, save_path='results
                       verbose=verbose_opc)
 
         evaluate_model(x_test, y_cat_test, batch_size, model, n_epochs, h, n_classes, folder_name=save_path,
-                       save_results=save_results)
+                       save_results=save_results, is_rna=True)
     else:
         model.fit(x_train, y_train)
 
