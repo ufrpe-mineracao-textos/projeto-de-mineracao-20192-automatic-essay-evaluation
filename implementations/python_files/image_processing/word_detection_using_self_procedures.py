@@ -29,7 +29,7 @@ def show_images(*args):
 
 if __name__ == '__main__':
     images_paths, texts_paths = create_iam_dataset_path_list(IAM, IAM_TEXT)
-    choice = 0
+    choice = 12
     chosen_path = images_paths[choice][0] + images_paths[choice][1][0]
 
     image = cv2.imread(chosen_path)
@@ -75,6 +75,6 @@ if __name__ == '__main__':
     clusters = [c for c in clusters if len(c) != 0]
     # Sorting centroid clusters by x axis
     for i, c in enumerate(clusters):
-        clusters[i] = np.sort(clusters[i], axis=1)
+        clusters[i] = np.array(sorted(clusters[i], key=lambda x: x[1]))
 
     print(len(clusters))
