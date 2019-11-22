@@ -7,8 +7,8 @@ from scipy.spatial.distance import euclidean, cosine
 from data_procedures import create_iam_dataset_path_list
 from imutils.object_detection import non_max_suppression
 
-user_folder = "ismael"
-datasets_folder = "Downloads"
+user_folder = "user_folder"
+datasets_folder = "folder_where_the_datasets_are_located"
 
 NIST = "/home/" + user_folder + "/" + datasets_folder + "/NIST"
 IAM = "/home/" + user_folder + "/" + datasets_folder + "/IAM-dataset/lineImages/"
@@ -109,7 +109,8 @@ def word_segmentation(image, verbose=False, thresh_distance=.001, distance='eucl
 
 def show_images(*args):
     for i, a in enumerate(args):
-        cv2.imshow("Output "+str(i), a)
+        # cv2.imshow("Output "+str(i)+".png", a)
+        cv2.imwrite("Output "+str(i)+".png", a)
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
@@ -123,11 +124,12 @@ if __name__ == '__main__':
 
     image = cv2.imread(chosen_path)
 
-    rectangles = word_segmentation(image, thresh_distance=350, distance='euclidean')
+    # Euclidean 400, 900, cosine:.059, 0.29
+    rectangles = word_segmentation(image, thresh_distance=0.029, distance='cosine')
 
     detection = image.copy()
 
     for vertices in rectangles:
-        cv2.rectangle(detection, (vertices[0], vertices[1]), (vertices[2], vertices[3]), (0, 255, 0), 2)
+        cv2.rectangle(detection, (vertices[0], vertices[1]), (vertices[2], vertices[3]), (0, 255, 0), 10)
 
     show_images(image, detection)
