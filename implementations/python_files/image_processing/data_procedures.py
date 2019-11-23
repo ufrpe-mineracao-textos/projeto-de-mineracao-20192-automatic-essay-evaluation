@@ -13,6 +13,8 @@
 """
 import os
 import sys
+import numpy as np
+import cv2
 import pandas as pd
 
 
@@ -91,3 +93,14 @@ def create_nist_dataset_path_list(custom_nist_path='NIST/'):
             paths_list.append((subdir+'/', images_paths))
 
     return paths_list
+
+
+def load_essays(path=".../../../data/"):
+
+    essays = []
+    for sub_dir, dir, files in os.walk(path):
+        for file in files:
+            file_name = file.replace('.png', '')
+            essays.append(cv2.imread(sub_dir+'/'+file))
+
+    return essays

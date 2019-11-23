@@ -4,9 +4,9 @@
 import cv2
 import numpy as np
 from scipy.spatial.distance import euclidean, cosine
-from data_procedures import create_iam_dataset_path_list
+from data_procedures import create_iam_dataset_path_list, load_essays
 from imutils.object_detection import non_max_suppression
-
+from line_remover import bining_image
 user_folder = "user_folder"
 datasets_folder = "folder_where_the_datasets_are_located"
 
@@ -109,14 +109,42 @@ def word_segmentation(image, verbose=False, thresh_distance=.001, distance='eucl
 
 def show_images(*args):
     for i, a in enumerate(args):
-        # cv2.imshow("Output "+str(i)+".png", a)
-        cv2.imwrite("Output "+str(i)+".png", a)
+        cv2.imshow("Output "+str(i), a)
+        # cv2.imwrite("Output "+str(i)+".png", a)
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
+    essays_list = load_essays(path="/home/ismael/Documentos/Github/projeto-de-mineracao-20192-automatic-essay-evaluation/data/essay_pictures")
+
+    chosen_essay = 2
+    essay = essays_list[chosen_essay]
+    blur_essay= cv2.GaussianBlur(essay, (3, 3), 15, 25)
+    gray_essay = cv2.cvtColor(essay, cv2.COLOR_BGR2GRAY)
+    _, binary = cv2.threshold(gray_essay, 145, 255, cv2.THRESH_BINARY_INV)
+
+    dilated_binary = cv2.dilate(binary, np.ones((3, 3)), iterations=2)
+    hLines = cv2.HoughLines(dilated_binary, 1, np.pi/2, 950)
+
+    lines_coordinates = []
+    for i in range(len(hLines)):
+        for rho, theta in hLines[i]:
+            a = np.cos(theta)
+            b = np.sin(theta)
+            x0 = a * rho
+            y0 = b * rho
+            x1 = int(x0 + essay.shape[0] * (-b))
+            y1 = int(y0 + essay.shape[0] * (a))
+            x2 = int(x0 - essay.shape[0] * (-b))
+            y2 = int(y0 - essay.shape[0] * (a))
+            lines_coordinates.append([x1, y1, x2, y2])
+    lines = sorted(lines_coordinates, key=lambda x: x[0])
+
+    essay[:lines_coordinates[0][2], :] = 255
+    show_images(essay)
+    """
     images_paths, texts_paths = create_iam_dataset_path_list(IAM, IAM_TEXT)
     choice = 0
     # choice = 0
@@ -133,3 +161,4 @@ if __name__ == '__main__':
         cv2.rectangle(detection, (vertices[0], vertices[1]), (vertices[2], vertices[3]), (0, 255, 0), 10)
 
     show_images(image, detection)
+    """
