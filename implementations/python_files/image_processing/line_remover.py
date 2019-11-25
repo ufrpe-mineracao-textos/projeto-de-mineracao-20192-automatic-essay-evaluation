@@ -270,7 +270,7 @@ def remove_lines(img, iterations=10):
     return new_img
 
 
-def show_textLines(essay, LINES):
+def show_textLines(essay, LINES, verbose=False):
     """
     Divide essay image by line, in the text rectangle destined to the handwriten text of the candidate
     and returns a list of the lines in the essays that were segmented
@@ -285,7 +285,8 @@ def show_textLines(essay, LINES):
     # for i in range(len(bounds)):
     list_of_essay_lines = []
     for i in range(len(bounds)):
-        print('Linha ' + str(i + 1))
+        if verbose:
+            print('[INFO] Segmetando Linha ' + str(i + 1))
         essay_line = remove_lines(255 - essay[bounds[i][0]:bounds[i][1], vlines[1][1]:vlines[2][1]])
         list_of_essay_lines.append(essay_line)
 
