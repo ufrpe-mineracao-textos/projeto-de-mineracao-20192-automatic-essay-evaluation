@@ -7,6 +7,175 @@ import cv2
 import numpy as np
 
 
+# As funções calculam a intensidades média para cada linha ou coluna da imagem
+# e retornam as possíveis linhas horizontais ou verticais baseada no limiar informado.
+# Para obter-se o resultado esperado pode ser necessário ordenar todas as linhas
+# obtidas baseado em alguma característica, como espessura ou posição.
+
+def verticalLines(image, thresh, totalLines=None, sort='thickness', reverse=True):
+    vals = np.array([s for s in [np.sum(image[:, y]) / (255 * image.shape[0]) for y in range(image.shape[1])]])
+    lines = []
+    y = 0
+    while y < image.shape[1]:
+        if vals[y] < thresh:
+            start = y
+            y += 1
+            while y < image.shape[1] - 1 and vals[y] < thresh:
+                y += 1
+            l = {}
+            l['pos'] = (start, y)
+            l['thickness'] = y - start
+            l['mean'] = np.mean(vals[start:y])
+            lines.append(l)
+        y += 1
+    if sort == 'thickness':
+        lines.sort(key=lambda x: x[sort], reverse=reverse)
+    else:
+        lines.sort(key=lambda x: x[sort], reverse=reverse)
+    if totalLines == None:
+        return lines
+    else:
+        return lines[:min(totalLines, len(lines))]
+
+
+def horizontalLines(image, thresh, totalLines=None, sort='thickness', reverse=True):
+    vals = np.array([s for s in [np.sum(image[x, :]) / (255 * image.shape[1]) for x in range(image.shape[0])]])
+    lines = []
+    x = 0
+    while x < image.shape[0]:
+        if vals[x] < thresh:
+            start = x
+            x += 1
+            while x < image.shape[0] - 1 and vals[x] < thresh:
+                x += 1
+            l = {}
+            l['pos'] = (start, x)
+            l['thickness'] = x - start
+            l['mean'] = np.mean(vals[start:x])
+            lines.append(l)
+        x += 1
+    if sort == 'thickness':
+        lines.sort(key=lambda x: x[sort], reverse=reverse)
+    else:
+        lines.sort(key=lambda x: x[sort], reverse=reverse)
+    if totalLines == None:
+        return lines
+    else:
+        return lines[:min(totalLines, len(lines))]
+
+
+def findLinesInEssays(essays):
+    # Tentando detectar as posições das 4 linhas mais grossas
+    LINES = {}
+    for e in essays:
+        # gray = cv2.cvtColor(essays[e],cv2.COLOR_BGR2GRAY)
+        gray = essays[e].copy()
+        for t in np.arange(0.4, 0.9, 0.1):
+            hlines = horizontalLines(gray, t, 2)
+            if len(hlines) == 2:
+                break
+        if len(hlines) != 2:
+            print('Linhas horizontais delimitantes não encontradas (' + str(len(hlines)) + '/' + '2)')
+            print('essay: ' + e)
+            return {}
+        thresh = [t]
+        for t in np.arange(0.4, 0.9, 0.1):
+            vlines = verticalLines(gray, t, 2)
+            if len(vlines) == 2:
+                break
+        if len(vlines) != 2:
+            print('Linhas verticais delimitantes não encontradas (' + str(len(vlines)) + '/' + '2)')
+            print('essay: ' + e)
+            return {}
+        thresh.append(t)
+
+        LINES[e] = {}
+        LINES[e]['vertical'] = vlines
+        LINES[e]['horizontal'] = hlines
+
+        # Tentando detectar o restante
+        evlines = [v['pos'] for v in LINES[e]['vertical']]
+        evlines.sort()
+        # print(evlines)
+        # tenta cortar a numeração
+        cropV = int(np.round((evlines[1][0] - evlines[0][1]) / 50))
+        start = evlines[0][1] + cropV
+        end = evlines[1][0] - cropV
+        for t in np.arange(0.4, 0.9, 0.1):
+            vlines = verticalLines(gray[:, start:end], t, 1)
+            for i in range(len(vlines)):
+                t = vlines[i]['pos']
+                vlines[i]['pos'] = (t[0] + start, t[1] + start)
+            if len(vlines) == 1:
+                break
+        if len(vlines) != 1:
+            print('Linhas verticais não encontradas (0/1)')
+            print('essay: ' + e)
+            return {}
+        thresh.append(t)
+
+        LINES[e]['vertical'] += vlines
+        LINES[e]['vertical'].sort(key=lambda a: a['pos'][0])
+
+        ehlines = [h['pos'] for h in LINES[e]['horizontal']]
+        ehlines.sort()
+
+        # procura as linhas horizontais de uma em uma
+        pixels_per_line = (ehlines[1][0] - ehlines[0][1]) / 30
+        cropH = int(pixels_per_line / 4)
+
+        for l in range(29):
+            for t in np.arange(0.4, 0.9, 0.1):
+                start = ehlines[0][1] + int(l * pixels_per_line) + cropH
+                end = start + int(pixels_per_line)  # - cropH
+                # hlines = horizontalLines(gray[start:end,evlines[0][1]+cropV:vlines[0]['pos'][1]], t, 1, sort='pos', reverse=True) # Procura somente na área da numeração
+                hlines = horizontalLines(gray[start:end, :], t, 1, sort='pos', reverse=True)  # Procura em toda a área
+                hlines.sort(key=lambda a: a['pos'], reverse=True)
+                hlines = hlines[:1]
+                for i in range(len(hlines)):
+                    t = hlines[i]['pos']
+                    hlines[i]['pos'] = (t[0] + start, t[1] + start)
+                if len(hlines) == 1:
+                    break
+            if len(hlines) != 1:
+                print('Linhas horizontais não encontradas (' + str(l) + '/' + '29)')
+                print('essay: ' + e)
+                # cv2_imshow(gray)
+                # LINES[e] = {}
+                # error.append()
+                break
+            thresh.append(t)
+            LINES[e]['horizontal'] += hlines
+        LINES[e]['horizontal'].sort(key=lambda a: a['pos'][0])
+
+    return LINES
+
+
+# Utilizar com imagem binarizada
+# Deixando somente as àreas detectadas
+def textLinesBounds(essay, horizontalLines, verticalLines):
+    horizontalLines = [h['pos'] for h in horizontalLines]
+    verticalLines = [v['pos'] for v in verticalLines]
+    # Com a imagem invertida, a soma de uma área totalmente branca será 0
+    essay = 255 - essay[:, verticalLines[1][1]:verticalLines[2][0]]
+    tlBounds = []
+    for i in range(len(horizontalLines)-2):
+        # Caso não haja uma divisão exata (linha totalmente branca), o limite inferior englobará a metade da próxima linha
+        lowestBound = horizontalLines[i+1][1] + int((horizontalLines[i+2][0] - horizontalLines[i+1][1]) / 2)
+        lb = lowestBound
+        for y in range(lb, lowestBound+1):
+            ys = np.sum(essay[y,:])
+            if ys == 0: # tudo branco
+                print('HEY')
+                lb = y
+                break
+        tlBounds.append((horizontalLines[i][1], lb))
+    # Última linha é exceção
+    tlBounds.append((horizontalLines[-2][1], horizontalLines[-1][0]))
+    return tlBounds
+
+# ==========================================================================================
+
 def remove_lines_horizontal(img, i):
     if (i):
         kernel = np.array([[-2, 4, -2], [-4, 7.55, -4], [-2, 4, -2]])
@@ -99,6 +268,29 @@ def remove_lines(img, iterations=10):
         new_img = np.bitwise_and(new_img, binimg)
 
     return new_img
+
+
+def show_textLines(essay, LINES):
+    """
+    Divide essay image by line, in the text rectangle destined to the handwriten text of the candidate
+    and returns a list of the lines in the essays that were segmented
+    :param essay:
+    :param LINES:
+    :return:
+    """
+    binary = bining_image(essay, pivot=64)
+    # cv2_imshow(binary)
+    bounds = textLinesBounds(binary, LINES['horizontal'], LINES['vertical'])
+    vlines = [v['pos'] for v in LINES['vertical']]
+    # for i in range(len(bounds)):
+    list_of_essay_lines = []
+    for i in range(len(bounds)):
+        print('Linha ' + str(i + 1))
+        essay_line = remove_lines(255 - essay[bounds[i][0]:bounds[i][1], vlines[1][1]:vlines[2][1]])
+        list_of_essay_lines.append(essay_line)
+
+    return list_of_essay_lines
+        # remove_lines(255-essay[bounds[i][0]:bounds[i][1],vlines[1][1]:vlines[2][1]])
 
 
 def get_labeled_connected_components(img, connectivity=8):

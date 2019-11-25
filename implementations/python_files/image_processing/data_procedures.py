@@ -95,12 +95,20 @@ def create_nist_dataset_path_list(custom_nist_path='NIST/'):
     return paths_list
 
 
-def load_essays(path=".../../../data/"):
+def load_essays(path=".../../../data/", gray_scale=False):
+    """
+    Load essays pictures from folders
+    :param path: Path to the essays folder
+    :param gray_scale: Option indcating the desire to use gray scale or not when loading the essays
+    :return: Dictionary with the essays
+    """
 
-    essays = []
+    essays = {}
     for sub_dir, dir, files in os.walk(path):
         for file in files:
             file_name = file.replace('.png', '')
-            essays.append(cv2.imread(sub_dir+'/'+file))
-
+            if not gray_scale:
+                essays[file_name] = cv2.imread(sub_dir+'/'+file)
+            else:
+                essays[file_name] = cv2.imread(sub_dir + '/' + file, 0)
     return essays
